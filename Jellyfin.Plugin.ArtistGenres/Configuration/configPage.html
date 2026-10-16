@@ -55,7 +55,7 @@
 
                 <div id="musicBrainzSettings" class="artistGenresPanel">
                     <h2>MusicBrainz</h2>
-                    <p class="artistGenresSummary">Writes MusicBrainz genre names, most-voted first, in MusicBrainz's own spelling. Artists use their artist page. Albums use the release group. Songs take the album, because the tracks in this library have no recording id.</p>
+                    <p class="artistGenresSummary">Writes MusicBrainz genre names, most-voted first, in MusicBrainz's own spelling. A song keeps its artist's genres and its album's genres, so the two meet. Spellings already in the library, such as Game, Film Scores, and Alternative &amp; Indie, are folded into those names.</p>
 
                     <div class="inputContainer">
                         <label class="inputLabel" for="mbServer">Server</label>
@@ -80,7 +80,7 @@
                             <input is="emby-checkbox" id="mbInherit" type="checkbox" />
                             <span>Songs inherit the album</span>
                         </label>
-                        <div class="fieldDescription">Turn this off to tag a song only when it has its own MusicBrainz recording id.</div>
+                        <div class="fieldDescription">Songs include the artist's genres as well as the album's. Turn this off to leave artist genres off the songs.</div>
                     </div>
 
                     <div class="inputContainer">
