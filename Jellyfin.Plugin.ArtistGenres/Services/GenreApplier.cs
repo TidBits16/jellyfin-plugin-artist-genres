@@ -88,17 +88,14 @@ public sealed class GenreApplier
                 cancellationToken.ThrowIfCancellationRequested();
                 var artist = (MusicArtist)item;
                 artistsByName.TryAdd(artist.Name, artist);
-                var direct = GenreCanonicalizer.Canonicalize(await ResolveArtistAsync(artist, albums, albumSource, config, cancellationToken).ConfigureAwait(false));
-                artistLabels[artist.Id] = direct.Count > 0
-                    ? direct
-                    : GenreCanonicalizer.Canonicalize(artist.Genres);
+                artistLabels[artist.Id] = GenreCanonicalizer.Canonicalize(await ResolveArtistAsync(artist, albums, albumSource, config, cancellationToken).ConfigureAwait(false));
             }
 
             foreach (var item in songs)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var song = (AudioItem)item;
-                var includeArtist = config.Source != GenreSources.MusicBrainz || config.MusicBrainzInheritAlbumGenres;
+                var includeArtist = config.Source == GenreSources.MusicBrainz && config.MusicBrainzInheritAlbumGenres;
                 var genres = GenresForSong(song, albumSource, artistLabels, artistsByName, includeArtist);
                 songGenres[song.Id] = genres;
                 if (config.UpdateSongs)
@@ -116,7 +113,8 @@ public sealed class GenreApplier
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var album = (MusicAlbum)item;
-                    await WriteAsync(album, GenresForAlbum(album, albumSource, artistLabels, artistsByName), config, stats, cancellationToken).ConfigureAwait(false);
+                    albumSource.TryGetValue(album.Id, out var albumGenres);
+                    await WriteAsync(album, albumGenres ?? [], config, stats, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -143,11 +141,10 @@ public sealed class GenreApplier
         }
 
         _logger.LogInformation(
-            "Artist Genres ({Source}) updated {Updated}, left {Unchanged} unchanged, skipped {Empty} with no source genres and {Locked} with genres locked.",
+            "Artist Genres ({Source}) replaced genres on {Updated} items, left {Unchanged} unchanged, and skipped {Locked} with genres locked.",
             config.Source,
             stats.Updated,
             stats.Unchanged,
-            stats.SkippedEmpty,
             stats.SkippedLocked);
     }
 
@@ -212,7 +209,6 @@ public sealed class GenreApplier
         IReadOnlyDictionary<string, MusicArtist> artistsByName,
         bool includeArtist)
     {
-        var (aliases, plain) = SplitExisting(song.Genres);
         var album = FindAlbum(song);
         IReadOnlyList<string> fromAlbum = [];
         if (album is not null && albumSource.TryGetValue(album.Id, out var found))
@@ -220,41 +216,12 @@ public sealed class GenreApplier
             fromAlbum = found;
         }
 
-        var labels = includeArtist
-            ? LabelsFor(ArtistNames(song), artistLabels, artistsByName)
-            : [];
-        return Combine(aliases, labels, fromAlbum, plain);
-    }
-
-    private static IReadOnlyList<string> GenresForAlbum(
-        MusicAlbum album,
-        IReadOnlyDictionary<Guid, IReadOnlyList<string>> albumSource,
-        IReadOnlyDictionary<Guid, IReadOnlyList<string>> artistLabels,
-        IReadOnlyDictionary<string, MusicArtist> artistsByName)
-    {
-        var (aliases, plain) = SplitExisting(album.Genres);
-        albumSource.TryGetValue(album.Id, out var fromSource);
-        var names = album.AlbumArtists is { Count: > 0 } ? album.AlbumArtists : album.Artists;
-        return Combine(aliases, LabelsFor(names ?? [], artistLabels, artistsByName), fromSource ?? [], plain);
-    }
-
-    private static (IReadOnlyList<string> Aliases, IReadOnlyList<string> Plain) SplitExisting(IEnumerable<string>? genres)
-    {
-        var aliases = new List<string>();
-        var plain = new List<string>();
-        foreach (var entry in GenreCanonicalizer.Expand(genres))
+        if (!includeArtist)
         {
-            if (entry.FromAlias)
-            {
-                aliases.Add(entry.Name);
-            }
-            else
-            {
-                plain.Add(entry.Name);
-            }
+            return fromAlbum;
         }
 
-        return (aliases, plain);
+        return Combine(LabelsFor(ArtistNames(song), artistLabels, artistsByName), fromAlbum);
     }
 
     private static IReadOnlyList<string> LabelsFor(
@@ -425,12 +392,6 @@ public sealed class GenreApplier
     private async Task WriteAsync(BaseItem item, IReadOnlyList<string> genres, PluginConfiguration config, ApplyStats stats, CancellationToken cancellationToken)
     {
         var trimmed = Trim(genres, config.MaxGenres);
-        if (trimmed.Count == 0)
-        {
-            stats.SkippedEmpty++;
-            return;
-        }
-
         if (item.LockedFields.Contains(MetadataField.Genres))
         {
             stats.SkippedLocked++;
@@ -617,8 +578,6 @@ public sealed class GenreApplier
         public int Updated { get; set; }
 
         public int Unchanged { get; set; }
-
-        public int SkippedEmpty { get; set; }
 
         public int SkippedLocked { get; set; }
     }

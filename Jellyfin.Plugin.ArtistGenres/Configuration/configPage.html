@@ -41,7 +41,7 @@
     <div data-role="content">
         <div class="content-primary">
             <h1>Artist Genres</h1>
-            <p class="artistGenresLead">Pick one source. Its settings are the ones below, and that source's own genre names are what get written onto artists, albums, and songs. The other source stays saved.</p>
+            <p class="artistGenresLead">Pick one source. Apply replaces the genres on artists, albums, and songs with that source's names. Names already on an item are removed.</p>
 
             <form id="artistGenresConfigurationForm">
                 <div class="selectContainer">
@@ -122,7 +122,7 @@
                             <input is="emby-checkbox" data-panel="MusicBrainz" data-field="keepOriginal" type="checkbox" />
                             <span>Keep the original file genres</span>
                         </label>
-                        <div class="fieldDescription">The first apply stores the genres that were already on each item, so a later source switch does not forget them.</div>
+                        <div class="fieldDescription">Saves the genres from before the first apply. They stay in the plugin's notes and are not written back onto the items.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -177,7 +177,7 @@
                             <input is="emby-checkbox" data-panel="Discogs" data-field="updateSongs" type="checkbox" />
                             <span>Songs</span>
                         </label>
-                        <div class="fieldDescription">These three are the items that get rewritten.</div>
+                        <div class="fieldDescription">These three are replaced. A song gets its album's names only, so one album does not inherit the artist's other albums.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -193,7 +193,7 @@
                             <input is="emby-checkbox" data-panel="Discogs" data-field="keepOriginal" type="checkbox" />
                             <span>Keep the original file genres</span>
                         </label>
-                        <div class="fieldDescription">The first apply stores the genres that were already on each item, so a later source switch does not forget them.</div>
+                        <div class="fieldDescription">Saves the genres from before the first apply. They stay in the plugin's notes and are not written back onto the items.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
