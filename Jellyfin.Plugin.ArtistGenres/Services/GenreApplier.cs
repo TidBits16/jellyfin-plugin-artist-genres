@@ -1,0 +1,502 @@
+using Jellyfin.Data.Enums;
+using Jellyfin.Plugin.ArtistGenres.Configuration;
+using Jellyfin.Plugin.ArtistGenres.Providers;
+using Jellyfin.Plugin.ArtistGenres.Storage;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.Audio;
+using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Entities;
+using Microsoft.Extensions.Logging;
+using AudioItem = MediaBrowser.Controller.Entities.Audio.Audio;
+
+namespace Jellyfin.Plugin.ArtistGenres.Services;
+
+/// <summary>
+/// Resolves the selected source and writes its genre names onto the music library.
+/// </summary>
+public sealed class GenreApplier
+{
+    private readonly ILibraryManager _libraryManager;
+
+    private readonly MusicBrainzGenreClient _musicBrainz;
+
+    private readonly DiscogsGenreClient _discogs;
+
+    private readonly GenreMemory _memory;
+
+    private readonly GenreCache _cache;
+
+    private readonly ILogger<GenreApplier> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GenreApplier"/> class.
+    /// </summary>
+    public GenreApplier(
+        ILibraryManager libraryManager,
+        MusicBrainzGenreClient musicBrainz,
+        DiscogsGenreClient discogs,
+        GenreMemory memory,
+        GenreCache cache,
+        ILogger<GenreApplier> logger)
+    {
+        _libraryManager = libraryManager;
+        _musicBrainz = musicBrainz;
+        _discogs = discogs;
+        _memory = memory;
+        _cache = cache;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Looks up the selected source and replaces genres that differ.
+    /// </summary>
+    public async Task ApplyAsync(IProgress<double> progress, CancellationToken cancellationToken)
+    {
+        var config = CurrentConfiguration();
+        if (config.Source == GenreSources.Discogs && string.IsNullOrWhiteSpace(config.DiscogsToken))
+        {
+            _logger.LogError("Discogs is selected, but no personal access token is set. Nothing was changed.");
+            progress.Report(100);
+            return;
+        }
+
+        var stats = new ApplyStats();
+        var albums = Load(BaseItemKind.MusicAlbum);
+        var songs = config.UpdateSongs ? Load(BaseItemKind.Audio) : [];
+        var artists = config.UpdateArtists ? Load(BaseItemKind.MusicArtist) : [];
+        var albumGenres = new Dictionary<Guid, IReadOnlyList<string>>();
+        var total = Math.Max(1, albums.Count + songs.Count + artists.Count);
+        var done = 0;
+
+        try
+        {
+            foreach (var item in albums)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var album = (MusicAlbum)item;
+                var genres = await ResolveAlbumAsync(album, config, cancellationToken).ConfigureAwait(false);
+                albumGenres[album.Id] = genres;
+                if (config.UpdateAlbums)
+                {
+                    await WriteAsync(album, genres, config, stats, cancellationToken).ConfigureAwait(false);
+                }
+
+                done++;
+                progress.Report(done * 100d / total);
+            }
+
+            foreach (var item in songs)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var genres = await ResolveSongAsync((AudioItem)item, albumGenres, config, cancellationToken).ConfigureAwait(false);
+                await WriteAsync(item, genres, config, stats, cancellationToken).ConfigureAwait(false);
+                done++;
+                progress.Report(done * 100d / total);
+            }
+
+            foreach (var item in artists)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var artist = (MusicArtist)item;
+                var genres = await ResolveArtistAsync(artist, albums, albumGenres, config, cancellationToken).ConfigureAwait(false);
+                await WriteAsync(artist, genres, config, stats, cancellationToken).ConfigureAwait(false);
+                done++;
+                progress.Report(done * 100d / total);
+            }
+        }
+        finally
+        {
+            _memory.Save();
+            _cache.Save();
+            progress.Report(100);
+        }
+
+        _logger.LogInformation(
+            "Artist Genres ({Source}) updated {Updated}, left {Unchanged} unchanged, skipped {Empty} with no source genres and {Locked} with genres locked.",
+            config.Source,
+            stats.Updated,
+            stats.Unchanged,
+            stats.SkippedEmpty,
+            stats.SkippedLocked);
+    }
+
+    /// <summary>
+    /// Puts the last applied genre lists back. A library scan reads file tags again, and this runs after that scan.
+    /// </summary>
+    public async Task ReapplyAsync(IProgress<double> progress, CancellationToken cancellationToken)
+    {
+        var config = CurrentConfiguration();
+        if (!config.ReapplyAfterLibraryScan)
+        {
+            progress.Report(100);
+            return;
+        }
+
+        var applied = _memory.AppliedSnapshot();
+        if (applied.Count == 0)
+        {
+            progress.Report(100);
+            return;
+        }
+
+        var stats = new ApplyStats();
+        var done = 0;
+        foreach (var (itemId, genres) in applied)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var item = _libraryManager.GetItemById(itemId);
+            if (item is not null)
+            {
+                await WriteAsync(item, genres, config, stats, cancellationToken).ConfigureAwait(false);
+            }
+
+            done++;
+            progress.Report(done * 100d / applied.Count);
+        }
+
+        _memory.Save();
+        if (stats.Updated > 0)
+        {
+            _logger.LogInformation("Artist Genres restored {Updated} items after a library scan.", stats.Updated);
+        }
+    }
+
+    private async Task<IReadOnlyList<string>> ResolveAlbumAsync(MusicAlbum album, PluginConfiguration config, CancellationToken cancellationToken)
+    {
+        var primary = await GenresForAlbumAsync(album, config.Source, config, cancellationToken).ConfigureAwait(false);
+        if (primary.Count > 0 || !config.FallbackToOtherSource)
+        {
+            return primary;
+        }
+
+        var other = config.Source == GenreSources.Discogs ? GenreSources.MusicBrainz : GenreSources.Discogs;
+        var fallback = await GenresForAlbumAsync(album, other, config, cancellationToken).ConfigureAwait(false);
+        return fallback.Count > 0 ? fallback : primary;
+    }
+
+    private async Task<IReadOnlyList<string>> ResolveSongAsync(
+        AudioItem song,
+        IReadOnlyDictionary<Guid, IReadOnlyList<string>> albumGenres,
+        PluginConfiguration config,
+        CancellationToken cancellationToken)
+    {
+        if (config.Source == GenreSources.MusicBrainz && !config.MusicBrainzInheritAlbumGenres)
+        {
+            var recordingId = ProviderId(song, "MusicBrainzTrack") ?? ProviderId(song, "MusicBrainzRecording");
+            if (recordingId is null)
+            {
+                return [];
+            }
+
+            return await _musicBrainz.GetRecordingGenresAsync(recordingId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
+        }
+
+        var album = FindAlbum(song);
+        if (album is null)
+        {
+            return [];
+        }
+
+        if (albumGenres.TryGetValue(album.Id, out var cached))
+        {
+            return cached;
+        }
+
+        return await ResolveAlbumAsync(album, config, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<IReadOnlyList<string>> ResolveArtistAsync(
+        MusicArtist artist,
+        IReadOnlyList<BaseItem> albums,
+        IReadOnlyDictionary<Guid, IReadOnlyList<string>> albumGenres,
+        PluginConfiguration config,
+        CancellationToken cancellationToken)
+    {
+        if (config.Source == GenreSources.MusicBrainz)
+        {
+            var artistId = ProviderId(artist, "MusicBrainzArtist");
+            if (artistId is not null)
+            {
+                var direct = await _musicBrainz.GetArtistGenresAsync(artistId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
+                if (direct.Count > 0)
+                {
+                    return direct;
+                }
+            }
+        }
+
+        var fromAlbums = Aggregate(AlbumsForArtist(artist, albums).Select(album =>
+            albumGenres.TryGetValue(album.Id, out var genres) ? genres : []));
+        if (fromAlbums.Count > 0 || !config.FallbackToOtherSource || config.Source != GenreSources.Discogs)
+        {
+            return fromAlbums;
+        }
+
+        var fallbackId = ProviderId(artist, "MusicBrainzArtist");
+        return fallbackId is null
+            ? fromAlbums
+            : await _musicBrainz.GetArtistGenresAsync(fallbackId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<IReadOnlyList<string>> GenresForAlbumAsync(MusicAlbum album, string source, PluginConfiguration config, CancellationToken cancellationToken)
+    {
+        if (source == GenreSources.Discogs)
+        {
+            return await DiscogsAlbumAsync(album, config, cancellationToken).ConfigureAwait(false);
+        }
+
+        var releaseGroupId = ProviderId(album, "MusicBrainzReleaseGroup");
+        if (releaseGroupId is not null)
+        {
+            var fromGroup = await _musicBrainz.GetReleaseGroupGenresAsync(releaseGroupId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
+            if (fromGroup.Count > 0)
+            {
+                return fromGroup;
+            }
+        }
+
+        var releaseId = ProviderId(album, "MusicBrainzAlbum");
+        return releaseId is null
+            ? []
+            : await _musicBrainz.GetReleaseGenresAsync(releaseId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<IReadOnlyList<string>> DiscogsAlbumAsync(MusicAlbum album, PluginConfiguration config, CancellationToken cancellationToken)
+    {
+        var mode = config.DiscogsFields;
+        var releaseId = ProviderId(album, "DiscogsRelease");
+        if (releaseId is not null)
+        {
+            return await _discogs.GetReleaseGenresAsync(releaseId, mode, cancellationToken).ConfigureAwait(false);
+        }
+
+        var masterId = ProviderId(album, "DiscogsMaster");
+        if (masterId is not null)
+        {
+            return await _discogs.GetMasterGenresAsync(masterId, mode, cancellationToken).ConfigureAwait(false);
+        }
+
+        var musicBrainzRelease = ProviderId(album, "MusicBrainzAlbum");
+        if (musicBrainzRelease is not null)
+        {
+            var pointer = await _musicBrainz.FindDiscogsPointerAsync(musicBrainzRelease, releaseGroup: false, cancellationToken).ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(pointer))
+            {
+                return await _discogs.GetPointerGenresAsync(pointer, mode, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        var musicBrainzGroup = ProviderId(album, "MusicBrainzReleaseGroup");
+        if (musicBrainzGroup is null)
+        {
+            return [];
+        }
+
+        var groupPointer = await _musicBrainz.FindDiscogsPointerAsync(musicBrainzGroup, releaseGroup: true, cancellationToken).ConfigureAwait(false);
+        return string.IsNullOrEmpty(groupPointer)
+            ? []
+            : await _discogs.GetPointerGenresAsync(groupPointer, mode, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task WriteAsync(BaseItem item, IReadOnlyList<string> genres, PluginConfiguration config, ApplyStats stats, CancellationToken cancellationToken)
+    {
+        var trimmed = Trim(genres, config.MaxGenres);
+        if (trimmed.Count == 0)
+        {
+            stats.SkippedEmpty++;
+            return;
+        }
+
+        if (item.LockedFields.Contains(MetadataField.Genres))
+        {
+            stats.SkippedLocked++;
+            return;
+        }
+
+        var current = item.Genres ?? [];
+        if (Same(current, trimmed))
+        {
+            stats.Unchanged++;
+            return;
+        }
+
+        if (config.KeepOriginalGenres)
+        {
+            _memory.RememberOriginal(item.Id, current);
+        }
+
+        item.Genres = trimmed.ToArray();
+        await item.UpdateToRepositoryAsync(ItemUpdateType.MetadataEdit, cancellationToken).ConfigureAwait(false);
+        _memory.RememberApplied(item.Id, trimmed);
+        stats.Updated++;
+    }
+
+    private List<BaseItem> Load(BaseItemKind kind)
+    {
+        var items = _libraryManager.GetItemList(new InternalItemsQuery
+        {
+            IncludeItemTypes = [kind],
+            Recursive = true
+        });
+
+        var list = new List<BaseItem>();
+        foreach (var item in items)
+        {
+            if (!item.IsVirtualItem)
+            {
+                list.Add(item);
+            }
+        }
+
+        return list;
+    }
+
+    private static IEnumerable<MusicAlbum> AlbumsForArtist(MusicArtist artist, IReadOnlyList<BaseItem> albums)
+    {
+        foreach (var item in albums)
+        {
+            if (item is MusicAlbum album && BelongsTo(album, artist.Name))
+            {
+                yield return album;
+            }
+        }
+    }
+
+    private static bool BelongsTo(MusicAlbum album, string? artistName)
+    {
+        if (string.IsNullOrWhiteSpace(artistName))
+        {
+            return false;
+        }
+
+        return ContainsName(album.AlbumArtists, artistName) || ContainsName(album.Artists, artistName);
+    }
+
+    private static bool ContainsName(IReadOnlyList<string>? names, string artistName)
+    {
+        if (names is null)
+        {
+            return false;
+        }
+
+        foreach (var name in names)
+        {
+            if (string.Equals(name, artistName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static MusicAlbum? FindAlbum(BaseItem item)
+    {
+        for (var parent = item.GetParent(); parent is not null; parent = parent.GetParent())
+        {
+            if (parent is MusicAlbum album)
+            {
+                return album;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? ProviderId(BaseItem item, string key)
+    {
+        if (item.ProviderIds is not null
+            && item.ProviderIds.TryGetValue(key, out var value)
+            && !string.IsNullOrWhiteSpace(value))
+        {
+            return value.Trim();
+        }
+
+        return null;
+    }
+
+    private static IReadOnlyList<string> Aggregate(IEnumerable<IReadOnlyList<string>> lists)
+    {
+        var counts = new Dictionary<string, (int Count, string Name)>(StringComparer.OrdinalIgnoreCase);
+        foreach (var list in lists)
+        {
+            foreach (var name in list)
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                if (counts.TryGetValue(name, out var existing))
+                {
+                    counts[name] = (existing.Count + 1, existing.Name);
+                }
+                else
+                {
+                    counts[name] = (1, name.Trim());
+                }
+            }
+        }
+
+        return counts.Values
+            .OrderByDescending(entry => entry.Count)
+            .Select(entry => entry.Name)
+            .ToArray();
+    }
+
+    private static IReadOnlyList<string> Trim(IReadOnlyList<string> genres, int max)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var list = new List<string>();
+        foreach (var genre in genres)
+        {
+            if (string.IsNullOrWhiteSpace(genre) || !seen.Add(genre))
+            {
+                continue;
+            }
+
+            list.Add(genre.Trim());
+            if (max > 0 && list.Count >= max)
+            {
+                break;
+            }
+        }
+
+        return list;
+    }
+
+    private static bool Same(IReadOnlyList<string> left, IReadOnlyList<string> right)
+    {
+        if (left.Count != right.Count)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < left.Count; index++)
+        {
+            if (!string.Equals(left[index], right[index], StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static PluginConfiguration CurrentConfiguration()
+    {
+        return Plugin.Instance?.Configuration ?? new PluginConfiguration();
+    }
+
+    private sealed class ApplyStats
+    {
+        public int Updated { get; set; }
+
+        public int Unchanged { get; set; }
+
+        public int SkippedEmpty { get; set; }
+
+        public int SkippedLocked { get; set; }
+    }
+}

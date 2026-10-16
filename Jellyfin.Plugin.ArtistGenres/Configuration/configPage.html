@@ -1,0 +1,374 @@
+<div id="artistGenresConfigurationPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-button,emby-input,emby-select,emby-checkbox">
+    <style>
+        #artistGenresConfigurationPage .artistGenresLead {
+            margin: 0 0 1.25em;
+            max-width: 46em;
+        }
+
+        #artistGenresConfigurationPage .artistGenresPanel {
+            border: 1px solid rgba(127, 127, 127, 0.4);
+            border-radius: 0.4em;
+            padding: 0.4em 1.15em 1.15em;
+            margin: 0.5em 0 1.25em;
+            max-width: 48em;
+        }
+
+        #artistGenresConfigurationPage .artistGenresPanel[hidden] {
+            display: none !important;
+        }
+
+        #artistGenresConfigurationPage .artistGenresPanel h2 {
+            margin: 0.7em 0 0.3em;
+        }
+
+        #artistGenresConfigurationPage .artistGenresSummary {
+            margin: 0 0 1em;
+            max-width: 44em;
+        }
+
+        #artistGenresConfigurationPage .artistGenresActions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75em;
+            margin-top: 0.5em;
+        }
+
+        #artistGenresConfigurationPage .artistGenresActions .emby-button {
+            margin: 0;
+        }
+    </style>
+
+    <div data-role="content">
+        <div class="content-primary">
+            <h1>Artist Genres</h1>
+            <p class="artistGenresLead">Pick one source. Its settings are the ones below, and that source's own genre names are what get written onto artists, albums, and songs. The other source stays saved.</p>
+
+            <form id="artistGenresConfigurationForm">
+                <div class="selectContainer">
+                    <label class="selectLabel" for="genreSource">Genre source</label>
+                    <select is="emby-select" id="genreSource" class="emby-select-withcolor">
+                        <option value="MusicBrainz">MusicBrainz</option>
+                        <option value="Discogs">Discogs</option>
+                    </select>
+                    <div class="fieldDescription">Switching this only changes which section you are editing. The library changes when you apply.</div>
+                </div>
+
+                <div id="musicBrainzSettings" class="artistGenresPanel">
+                    <h2>MusicBrainz</h2>
+                    <p class="artistGenresSummary">Writes MusicBrainz genre names, most-voted first, in MusicBrainz's own spelling. Artists use their artist page. Albums use the release group. Songs take the album, because the tracks in this library have no recording id.</p>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="mbServer">Server</label>
+                        <input is="emby-input" id="mbServer" type="url" />
+                        <div class="fieldDescription">Leave this on musicbrainz.org unless you run your own mirror.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="mbContact">Contact</label>
+                        <input is="emby-input" id="mbContact" type="text" autocomplete="off" />
+                        <div class="fieldDescription">An email or a URL. MusicBrainz requires one in the user agent. It is not shown in the library.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="mbMinimumVotes">Minimum votes</label>
+                        <input is="emby-input" id="mbMinimumVotes" type="number" min="0" max="100" />
+                        <div class="fieldDescription">Genres with fewer votes than this are dropped. 1 keeps everything MusicBrainz lists.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" id="mbInherit" type="checkbox" />
+                            <span>Songs inherit the album</span>
+                        </label>
+                        <div class="fieldDescription">Turn this off to tag a song only when it has its own MusicBrainz recording id.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="mbMaxGenres">Maximum genres</label>
+                        <input is="emby-input" data-panel="MusicBrainz" data-field="maxGenres" type="number" min="0" max="30" />
+                        <div class="fieldDescription">How many names to keep, in vote order. 0 keeps all of them.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="MusicBrainz" data-field="updateArtists" type="checkbox" />
+                            <span>Artists</span>
+                        </label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="MusicBrainz" data-field="updateAlbums" type="checkbox" />
+                            <span>Albums</span>
+                        </label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="MusicBrainz" data-field="updateSongs" type="checkbox" />
+                            <span>Songs</span>
+                        </label>
+                        <div class="fieldDescription">These three are the items that get rewritten.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="MusicBrainz" data-field="fallback" type="checkbox" />
+                            <span>Use Discogs when MusicBrainz has nothing</span>
+                        </label>
+                        <div class="fieldDescription">Needs the Discogs token from the other section. An item MusicBrainz does tag is left on MusicBrainz names.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="MusicBrainz" data-field="keepOriginal" type="checkbox" />
+                            <span>Keep the original file genres</span>
+                        </label>
+                        <div class="fieldDescription">The first apply stores the genres that were already on each item, so a later source switch does not forget them.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="MusicBrainz" data-field="reapply" type="checkbox" />
+                            <span>Put these genres back after a library scan</span>
+                        </label>
+                        <div class="fieldDescription">A scan reads the file tags again. This writes the MusicBrainz names back afterwards.</div>
+                    </div>
+                </div>
+
+                <div id="discogsSettings" class="artistGenresPanel" hidden>
+                    <h2>Discogs</h2>
+                    <p class="artistGenresSummary">Writes Discogs style names, in Discogs' own spelling. Albums are looked up from a Discogs release id, or from the MusicBrainz release already on the album. Songs take the album. Artists are filled from their albums, because Discogs has no artist genre list.</p>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="discogsToken">Personal access token</label>
+                        <input is="emby-input" id="discogsToken" type="password" autocomplete="off" />
+                        <div class="fieldDescription">From discogs.com/settings/developers. Discogs rejects requests without one, and nothing is changed until this is set.</div>
+                    </div>
+
+                    <div class="selectContainer">
+                        <label class="selectLabel" for="discogsFields">Names to write</label>
+                        <select is="emby-select" id="discogsFields" class="emby-select-withcolor">
+                            <option value="Styles">Styles</option>
+                            <option value="Genres">Genres</option>
+                            <option value="StylesAndGenres">Styles, then genres</option>
+                        </select>
+                        <div class="fieldDescription">Styles are the specific names, such as Indie Rock. Genres are the broad buckets, such as Rock.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="discogsMaxGenres">Maximum genres</label>
+                        <input is="emby-input" data-panel="Discogs" data-field="maxGenres" type="number" min="0" max="30" />
+                        <div class="fieldDescription">How many names to keep. 0 keeps all of them. Styles are kept ahead of genres.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="Discogs" data-field="updateArtists" type="checkbox" />
+                            <span>Artists</span>
+                        </label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="Discogs" data-field="updateAlbums" type="checkbox" />
+                            <span>Albums</span>
+                        </label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="Discogs" data-field="updateSongs" type="checkbox" />
+                            <span>Songs</span>
+                        </label>
+                        <div class="fieldDescription">These three are the items that get rewritten.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="Discogs" data-field="fallback" type="checkbox" />
+                            <span>Use MusicBrainz when Discogs has nothing</span>
+                        </label>
+                        <div class="fieldDescription">Game and web-series albums often have no Discogs release. Those keep MusicBrainz names instead of going blank.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="Discogs" data-field="keepOriginal" type="checkbox" />
+                            <span>Keep the original file genres</span>
+                        </label>
+                        <div class="fieldDescription">The first apply stores the genres that were already on each item, so a later source switch does not forget them.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input is="emby-checkbox" data-panel="Discogs" data-field="reapply" type="checkbox" />
+                            <span>Put these genres back after a library scan</span>
+                        </label>
+                        <div class="fieldDescription">A scan reads the file tags again. This writes the Discogs names back afterwards.</div>
+                    </div>
+                </div>
+
+                <div class="artistGenresActions">
+                    <button is="emby-button" type="submit" class="raised button-submit emby-button">
+                        <span>Save</span>
+                    </button>
+                    <button is="emby-button" type="button" id="artistGenresApply" class="raised emby-button">
+                        <span>Save and apply to library</span>
+                    </button>
+                </div>
+                <div class="fieldDescription">Apply runs in the background. The first pass asks the source about each album, about one a second, and later passes reuse what they already fetched.</div>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        (function () {
+            var pluginId = "c4e8a1d7-5b39-4f6a-8e2c-91d0f7a4b6e3";
+            var sharedFields = ["maxGenres", "updateArtists", "updateAlbums", "updateSongs", "fallback", "keepOriginal", "reapply"];
+
+            function pageElement() {
+                return document.getElementById("artistGenresConfigurationPage");
+            }
+
+            function field(panel, name) {
+                return pageElement().querySelector('[data-panel="' + panel + '"][data-field="' + name + '"]');
+            }
+
+            function copyShared(fromPanel, toPanel) {
+                sharedFields.forEach(function (name) {
+                    var from = field(fromPanel, name);
+                    var to = field(toPanel, name);
+                    if (!from || !to) {
+                        return;
+                    }
+
+                    if (from.type === "checkbox") {
+                        to.checked = from.checked;
+                    } else {
+                        to.value = from.value;
+                    }
+                });
+            }
+
+            function showSource(source, previous) {
+                if (previous && previous !== source) {
+                    copyShared(previous, source);
+                }
+
+                document.getElementById("musicBrainzSettings").hidden = source !== "MusicBrainz";
+                document.getElementById("discogsSettings").hidden = source !== "Discogs";
+            }
+
+            function writeShared(panel, config) {
+                field(panel, "updateArtists").checked = !!config.UpdateArtists;
+                field(panel, "updateAlbums").checked = !!config.UpdateAlbums;
+                field(panel, "updateSongs").checked = !!config.UpdateSongs;
+                field(panel, "fallback").checked = !!config.FallbackToOtherSource;
+                field(panel, "keepOriginal").checked = !!config.KeepOriginalGenres;
+                field(panel, "reapply").checked = !!config.ReapplyAfterLibraryScan;
+                field(panel, "maxGenres").value = config.MaxGenres;
+            }
+
+            function readShared(panel, config) {
+                config.UpdateArtists = field(panel, "updateArtists").checked;
+                config.UpdateAlbums = field(panel, "updateAlbums").checked;
+                config.UpdateSongs = field(panel, "updateSongs").checked;
+                config.FallbackToOtherSource = field(panel, "fallback").checked;
+                config.KeepOriginalGenres = field(panel, "keepOriginal").checked;
+                config.ReapplyAfterLibraryScan = field(panel, "reapply").checked;
+
+                var maxGenres = parseInt(field(panel, "maxGenres").value, 10);
+                config.MaxGenres = isNaN(maxGenres) || maxGenres < 0 ? 5 : maxGenres;
+            }
+
+            function readNumber(id, fallback) {
+                var value = parseInt(document.getElementById(id).value, 10);
+                return isNaN(value) || value < 0 ? fallback : value;
+            }
+
+            function loadConfiguration() {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    var source = config.Source === "Discogs" ? "Discogs" : "MusicBrainz";
+                    document.getElementById("genreSource").value = source;
+                    document.getElementById("mbServer").value = config.MusicBrainzServer || "https://musicbrainz.org";
+                    document.getElementById("mbContact").value = config.MusicBrainzContact || "";
+                    document.getElementById("mbMinimumVotes").value = config.MusicBrainzMinimumVotes;
+                    document.getElementById("mbInherit").checked = !!config.MusicBrainzInheritAlbumGenres;
+                    document.getElementById("discogsToken").value = config.DiscogsToken || "";
+                    document.getElementById("discogsFields").value = config.DiscogsFields || "Styles";
+                    writeShared("MusicBrainz", config);
+                    writeShared("Discogs", config);
+                    showSource(source);
+                    Dashboard.hideLoadingMsg();
+                });
+            }
+
+            function saveConfiguration(applyAfter) {
+                Dashboard.showLoadingMsg();
+                var source = document.getElementById("genreSource").value === "Discogs" ? "Discogs" : "MusicBrainz";
+
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    config.Source = source;
+                    readShared(source, config);
+                    config.MusicBrainzServer = (document.getElementById("mbServer").value || "").trim() || "https://musicbrainz.org";
+                    config.MusicBrainzContact = (document.getElementById("mbContact").value || "").trim();
+                    config.MusicBrainzMinimumVotes = readNumber("mbMinimumVotes", 1);
+                    config.MusicBrainzInheritAlbumGenres = document.getElementById("mbInherit").checked;
+                    config.DiscogsToken = (document.getElementById("discogsToken").value || "").trim();
+                    config.DiscogsFields = document.getElementById("discogsFields").value || "Styles";
+
+                    ApiClient.updatePluginConfiguration(pluginId, config).then(function (result) {
+                        if (!applyAfter) {
+                            Dashboard.processPluginConfigurationUpdateResult(result);
+                            return;
+                        }
+
+                        ApiClient.getScheduledTasks().then(function (tasks) {
+                            var task = (tasks || []).filter(function (entry) {
+                                return entry.Key === "ArtistGenresApply";
+                            })[0];
+
+                            if (!task) {
+                                Dashboard.hideLoadingMsg();
+                                Dashboard.alert("Settings saved. Restart Jellyfin once, then run Apply artist genres from Scheduled Tasks.");
+                                return;
+                            }
+
+                            ApiClient.startScheduledTask(task.Id).then(function () {
+                                Dashboard.hideLoadingMsg();
+                                Dashboard.alert("Settings saved. Genres are being applied. Progress is on the Scheduled Tasks page.");
+                            }, function () {
+                                Dashboard.hideLoadingMsg();
+                                Dashboard.alert("Settings saved, but the apply task did not start. Run Apply artist genres from Scheduled Tasks.");
+                            });
+                        }, function () {
+                            Dashboard.hideLoadingMsg();
+                            Dashboard.alert("Settings saved. Run Apply artist genres from Scheduled Tasks.");
+                        });
+                    }, function () {
+                        Dashboard.hideLoadingMsg();
+                        Dashboard.alert("Artist Genres settings could not be saved.");
+                    });
+                });
+            }
+
+            pageElement().addEventListener("pageshow", function () {
+                loadConfiguration();
+            });
+
+            document.getElementById("genreSource").addEventListener("change", function (event) {
+                var source = event.target.value === "Discogs" ? "Discogs" : "MusicBrainz";
+                var previous = source === "Discogs" ? "MusicBrainz" : "Discogs";
+                showSource(source, previous);
+            });
+
+            document.getElementById("artistGenresConfigurationForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                saveConfiguration(false);
+                return false;
+            });
+
+            document.getElementById("artistGenresApply").addEventListener("click", function () {
+                saveConfiguration(true);
+            });
+        })();
+    </script>
+</div>
