@@ -47,15 +47,15 @@
                 <div class="selectContainer">
                     <label class="selectLabel" for="genreSource">Genre source</label>
                     <select is="emby-select" id="genreSource" class="emby-select-withcolor">
+                        <option value="Discogs" selected>Discogs</option>
                         <option value="MusicBrainz">MusicBrainz</option>
-                        <option value="Discogs">Discogs</option>
                     </select>
-                    <div class="fieldDescription">Switching this only changes which section you are editing. The library changes when you apply.</div>
+                    <div class="fieldDescription" id="genreSourceDescription">I prefer less genres but more consistency (best for 1-10,000 songs).</div>
                 </div>
 
-                <div id="musicBrainzSettings" class="artistGenresPanel">
+                <div id="musicBrainzSettings" class="artistGenresPanel" hidden>
                     <h2>MusicBrainz</h2>
-                    <p class="artistGenresSummary">Writes MusicBrainz genre names, most-voted first, in MusicBrainz's own spelling. A song keeps its artist's genres and its album's genres, so the two meet. Spellings already in the library, such as Game, Film Scores, and Alternative &amp; Indie, are folded into those names.</p>
+                    <p class="artistGenresSummary">I have an unreasonable amount of songs but care most about genre accuracy (best for &gt;10,000 songs).</p>
 
                     <div class="inputContainer">
                         <label class="inputLabel" for="mbServer">Server</label>
@@ -134,9 +134,9 @@
                     </div>
                 </div>
 
-                <div id="discogsSettings" class="artistGenresPanel" hidden>
+                <div id="discogsSettings" class="artistGenresPanel">
                     <h2>Discogs</h2>
-                    <p class="artistGenresSummary">Writes Discogs style names, in Discogs' own spelling. Albums are looked up from a Discogs release id, or from the MusicBrainz release already on the album. Songs take the album. Artists are filled from their albums, because Discogs has no artist genre list.</p>
+                    <p class="artistGenresSummary">I prefer less genres but more consistency (best for 1-10,000 songs).</p>
 
                     <div class="inputContainer">
                         <label class="inputLabel" for="discogsToken">Personal access token</label>
@@ -222,6 +222,14 @@
         (function () {
             var pluginId = "c4e8a1d7-5b39-4f6a-8e2c-91d0f7a4b6e3";
             var sharedFields = ["maxGenres", "updateArtists", "updateAlbums", "updateSongs", "fallback", "keepOriginal", "reapply"];
+            var sourceDescriptions = {
+                Discogs: "I prefer less genres but more consistency (best for 1-10,000 songs).",
+                MusicBrainz: "I have an unreasonable amount of songs but care most about genre accuracy (best for >10,000 songs)."
+            };
+
+            function chosenSource(value) {
+                return value === "MusicBrainz" ? "MusicBrainz" : "Discogs";
+            }
 
             function pageElement() {
                 return document.getElementById("artistGenresConfigurationPage");
@@ -254,6 +262,7 @@
 
                 document.getElementById("musicBrainzSettings").hidden = source !== "MusicBrainz";
                 document.getElementById("discogsSettings").hidden = source !== "Discogs";
+                document.getElementById("genreSourceDescription").textContent = sourceDescriptions[source];
             }
 
             function writeShared(panel, config) {
@@ -286,7 +295,7 @@
             function loadConfiguration() {
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(pluginId).then(function (config) {
-                    var source = config.Source === "Discogs" ? "Discogs" : "MusicBrainz";
+                    var source = chosenSource(config.Source);
                     document.getElementById("genreSource").value = source;
                     document.getElementById("mbServer").value = config.MusicBrainzServer || "https://musicbrainz.org";
                     document.getElementById("mbContact").value = config.MusicBrainzContact || "";
@@ -303,7 +312,7 @@
 
             function saveConfiguration(applyAfter) {
                 Dashboard.showLoadingMsg();
-                var source = document.getElementById("genreSource").value === "Discogs" ? "Discogs" : "MusicBrainz";
+                var source = chosenSource(document.getElementById("genreSource").value);
 
                 ApiClient.getPluginConfiguration(pluginId).then(function (config) {
                     config.Source = source;
@@ -355,7 +364,7 @@
             });
 
             document.getElementById("genreSource").addEventListener("change", function (event) {
-                var source = event.target.value === "Discogs" ? "Discogs" : "MusicBrainz";
+                var source = chosenSource(event.target.value);
                 var previous = source === "Discogs" ? "MusicBrainz" : "Discogs";
                 showSource(source, previous);
             });

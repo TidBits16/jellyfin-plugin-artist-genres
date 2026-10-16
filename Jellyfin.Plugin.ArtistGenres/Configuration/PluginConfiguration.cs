@@ -34,7 +34,7 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     public PluginConfiguration()
     {
-        Source = GenreSources.MusicBrainz;
+        Source = GenreSources.Discogs;
         UpdateArtists = true;
         UpdateAlbums = true;
         UpdateSongs = true;
