@@ -122,8 +122,6 @@ internal static class GenreCanonicalizer
 
     private static readonly Dictionary<string, string[]> Parents = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["christian hip hop"] = ["hip hop"],
-        ["christian rock"] = ["rock"],
         ["video game music"] = ["soundtrack"],
         ["chiptune"] = ["electronic"],
         ["synth-pop"] = ["pop", "electronic"],
@@ -313,7 +311,7 @@ internal static class GenreCanonicalizer
 
     private static bool IsPiece(string piece)
     {
-        return ResolvePiece(piece).Count > 0;
+        return GenreLexicon.IsAllowed(piece);
     }
 
     private static IReadOnlyList<string> ResolvePiece(string piece)
