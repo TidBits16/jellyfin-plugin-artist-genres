@@ -2,7 +2,7 @@
 
 Jellyfin plugin that writes one genre vocabulary onto artists, albums, and songs.
 
-The standardized list — MusicBrainz’s official genres, the four umbrellas this plugin keeps, and how the DangerDrive library was classified — is here:
+Accepted genre names (MusicBrainz official list, plus a few umbrellas):
 
 **https://tidbits16.github.io/jellyfin-plugin-artist-genres/**
 
