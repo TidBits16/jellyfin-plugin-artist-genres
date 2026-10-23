@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Artist Genres — standardized list</title>
+  <meta name="description" content="MusicBrainz official genres plus the umbrellas Artist Genres keeps, compared against the DangerDrive library." />
+  <style>
+    :root {
+      --bg: #101014;
+      --bg-2: #18181e;
+      --line: #2a2a32;
+      --text: #ececf1;
+      --muted: #9a9aaa;
+      --accent: #6ea8fe;
+      --ok: #3dd68c;
+      --info: #6ea8fe;
+      --warn: #e6b450;
+      --drop: #f07178;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body {
+      font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    main { max-width: 1080px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    h1 { font-size: 1.75rem; font-weight: 650; letter-spacing: -0.03em; margin: 0 0 0.35rem; }
+    h2 { font-size: 1.2rem; font-weight: 650; margin: 2.2rem 0 0.5rem; }
+    h3 { font-size: 0.95rem; font-weight: 650; margin: 1.4rem 0 0.45rem; color: var(--muted); }
+    .lede { color: var(--muted); max-width: 46em; margin: 0 0 1.5rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin: 1.25rem 0 1.4rem;
+    }
+    .stat {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+    }
+    .stat b { display: block; font-size: 1.45rem; font-weight: 650; letter-spacing: -0.03em; }
+    .stat span { color: var(--muted); font-size: 0.8rem; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .drop { color: var(--drop); }
+    .note {
+      background: color-mix(in srgb, var(--info) 12%, var(--bg-2));
+      border: 1px solid color-mix(in srgb, var(--info) 35%, var(--line));
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      color: var(--text);
+      max-width: 54em;
+    }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.7rem 0 0.85rem; }
+    button.pill {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.28rem 0.75rem;
+      cursor: pointer;
+      font: inherit;
+    }
+    button.pill.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .chip {
+      display: inline-block;
+      border: 1px solid var(--line);
+      background: var(--bg-2);
+      border-radius: 999px;
+      padding: 0.22rem 0.7rem;
+      margin: 0 0.3rem 0.3rem 0;
+    }
+    input[type="search"] {
+      width: 100%;
+      max-width: 28rem;
+      background: var(--bg-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.55rem 0.75rem;
+      font: inherit;
+      margin: 0 0 0.85rem;
+    }
+    input[type="search"]:focus { outline: 1px solid var(--accent); }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      max-height: 34rem;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th {
+      position: sticky; top: 0;
+      background: var(--bg-2);
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tbody tr:nth-child(even) { background: color-mix(in srgb, var(--bg-2) 70%, transparent); }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .dot {
+      display: inline-block;
+      width: 0.5rem; height: 0.5rem;
+      border-radius: 50%;
+      margin-right: 0.45rem;
+      vertical-align: middle;
+    }
+    .dot.official { background: var(--ok); }
+    .dot.umbrella { background: var(--info); }
+    .dot.map { background: var(--warn); }
+    .dot.drop { background: var(--drop); }
+    footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; }
+    @media (max-width: 800px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Standardized genre list</h1>
+    <p class="lede">Artist Genres writes names from MusicBrainz’s official list. This page is that list, plus how 123 names on the DangerDrive library were classified on 23 Oct 2026.</p>
+
+    <div class="stats">
+      <div class="stat"><b>2,216</b><span>Official MusicBrainz genres</span></div>
+      <div class="stat"><b class="ok">88</b><span>Already real in the library</span></div>
+      <div class="stat"><b class="warn">14</b><span>Folded into a real name</span></div>
+      <div class="stat"><b class="drop">17</b><span>Dropped (not a genre)</span></div>
+    </div>
+
+    <p class="note">MusicBrainz has no umbrella named indie, alternative, soundtrack, or video game music. Those four stay so OSTs and indie filters still work. Everything else must be on the official list.</p>
+
+    <h2>Library names</h2>
+    <p class="lede">Cover-art tags and fragments are not genres. christmas and holiday become christmas music. christian hip hop and christian rock stay distinct.</p>
+    <div class="pills" id="filters"></div>
+    <input id="libraryQuery" type="search" placeholder="Filter library names…" autocomplete="off" />
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Library name</th>
+            <th class="num">Songs</th>
+            <th>Action</th>
+            <th>Becomes</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody id="libraryBody"></tbody>
+      </table>
+    </div>
+    <p class="lede" id="libraryCaption"></p>
+
+    <h2>All allowed names</h2>
+    <h3>Umbrellas kept for this library</h3>
+    <div id="extras"></div>
+    <h3>MusicBrainz official genres</h3>
+    <p class="lede">Search the full 2,216-name list. The plugin only writes names from this list, plus the four umbrellas.</p>
+    <input id="officialQuery" type="search" placeholder="Search official genres, e.g. chiptune" autocomplete="off" />
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Official genre</th></tr></thead>
+        <tbody id="officialBody"></tbody>
+      </table>
+    </div>
+    <p class="lede" id="officialCaption"></p>
+
+    <footer>
+      <a href="https://github.com/TidBits16/jellyfin-plugin-artist-genres">jellyfin-plugin-artist-genres</a>
+      · Source: <a href="https://musicbrainz.org/genres">musicbrainz.org/genres</a>
+      · Library: 2,221 songs, 273 albums, 201 artists
+    </footer>
+  </main>
+  <script>
+    const EXTRAS = ["indie", "alternative", "soundtrack", "video game music"];
+    const FILTERS = [
+      ["problem", "Needs a change"],
+      ["drop", "Drop"],
+      ["map", "Fold"],
+      ["umbrella", "Keep umbrella"],
+      ["official", "Already real"],
+      ["all", "All 123"],
+    ];
+    const labels = { official: "MusicBrainz", umbrella: "umbrella", map: "fold", drop: "drop" };
+    let library = [];
+    let official = [];
+    let filter = "problem";
+
+    function statusClass(status) {
+      return status;
+    }
+
+    function renderFilters() {
+      const root = document.getElementById("filters");
+      root.innerHTML = "";
+      FILTERS.forEach(([id, label]) => {
+        const b = document.createElement("button");
+        b.className = "pill" + (filter === id ? " active" : "");
+        b.type = "button";
+        b.textContent = label;
+        b.addEventListener("click", () => { filter = id; renderFilters(); renderLibrary(); });
+        root.appendChild(b);
+      });
+    }
+
+    function renderLibrary() {
+      const q = document.getElementById("libraryQuery").value.trim().toLowerCase();
+      const rows = library.filter((row) => {
+        if (filter === "problem" && row.status === "official") return false;
+        if (filter !== "all" && filter !== "problem" && row.status !== filter) return false;
+        if (!q) return true;
+        return row.library.toLowerCase().includes(q) || (row.mapsTo || "").toLowerCase().includes(q);
+      }).sort((a, b) => b.songs - a.songs || a.library.localeCompare(b.library));
+
+      const body = document.getElementById("libraryBody");
+      body.replaceChildren();
+      if (rows.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = '<td colspan="5">No names match that filter.</td>';
+        body.appendChild(tr);
+      } else {
+        rows.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td><span class="dot ' + statusClass(row.status) + '"></span>' + escapeHtml(row.library) + "</td>" +
+            '<td class="num">' + row.songs + "</td>" +
+            "<td>" + labels[row.status] + "</td>" +
+            "<td>" + escapeHtml(row.mapsTo || "—") + "</td>" +
+            "<td>" + escapeHtml(row.why) + "</td>";
+          body.appendChild(tr);
+        });
+      }
+      document.getElementById("libraryCaption").textContent =
+        rows.length + " of 123 library names · Jellyfin music library · 23 Oct 2026";
+    }
+
+    function renderExtras(q) {
+      const root = document.getElementById("extras");
+      root.innerHTML = "";
+      EXTRAS.filter((name) => !q || name.includes(q)).forEach((name) => {
+        const span = document.createElement("span");
+        span.className = "chip";
+        span.textContent = name;
+        root.appendChild(span);
+      });
+    }
+
+    function renderOfficial() {
+      const q = document.getElementById("officialQuery").value.trim().toLowerCase();
+      renderExtras(q);
+      const matches = q ? official.filter((name) => name.toLowerCase().includes(q)) : official;
+      const shown = q ? matches.slice(0, 80) : official.slice(0, 40);
+      const body = document.getElementById("officialBody");
+      body.replaceChildren();
+      if (shown.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = "<td>No official genre matches that search.</td>";
+        body.appendChild(tr);
+      } else {
+        shown.forEach((name) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = "<td>" + escapeHtml(name) + "</td>";
+          body.appendChild(tr);
+        });
+      }
+      document.getElementById("officialCaption").textContent = q
+        ? "Showing " + shown.length + " of " + matches.length + " matches from MusicBrainz genre/all · 23 Oct 2026"
+        : "First 40 of " + official.length + " official names. Type to search the rest.";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    Promise.all([
+      fetch("data/library.json").then((r) => r.json()),
+      fetch("data/musicbrainz-genres.txt").then((r) => r.text()),
+    ]).then(([lib, text]) => {
+      library = lib;
+      official = text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+      renderFilters();
+      renderLibrary();
+      renderOfficial();
+    });
+
+    document.getElementById("libraryQuery").addEventListener("input", renderLibrary);
+    document.getElementById("officialQuery").addEventListener("input", renderOfficial);
+  </script>
+</body>
+</html>

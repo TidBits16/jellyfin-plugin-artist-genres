@@ -1,0 +1,1109 @@
+[
+  {
+    "library": "acoustic",
+    "songs": 43,
+    "albums": 4,
+    "artists": 2,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "alt-pop",
+    "songs": 33,
+    "albums": 2,
+    "artists": 0,
+    "status": "map",
+    "mapsTo": "alternative pop",
+    "why": "Not a MusicBrainz genre. Folded into alternative pop."
+  },
+  {
+    "library": "alternative",
+    "songs": 307,
+    "albums": 51,
+    "artists": 34,
+    "status": "umbrella",
+    "mapsTo": "alternative",
+    "why": "Kept as a parent. MusicBrainz lists the specific names, not this umbrella."
+  },
+  {
+    "library": "alternative hip hop",
+    "songs": 1,
+    "albums": 1,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "alternative hip hop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "alternative pop",
+    "songs": 43,
+    "albums": 4,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "alternative pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "alternative r&b",
+    "songs": 13,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "alternative r&b",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "alternative rock",
+    "songs": 155,
+    "albums": 13,
+    "artists": 10,
+    "status": "official",
+    "mapsTo": "alternative rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "ambient",
+    "songs": 126,
+    "albums": 9,
+    "artists": 8,
+    "status": "official",
+    "mapsTo": "ambient",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "americana",
+    "songs": 2,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "americana",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "animal on cover",
+    "songs": 1,
+    "albums": 1,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "anthro on cover",
+    "songs": 1,
+    "albums": 1,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "artist name on cover",
+    "songs": 65,
+    "albums": 3,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "avant-garde jazz",
+    "songs": 0,
+    "albums": 0,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "avant-garde jazz",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "ballad",
+    "songs": 47,
+    "albums": 3,
+    "artists": 4,
+    "status": "official",
+    "mapsTo": "ballad",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "bass",
+    "songs": 1,
+    "albums": 1,
+    "artists": 3,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "beyond skyrim",
+    "songs": 60,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "video game music",
+    "why": "Not a MusicBrainz genre. Folded into video game music."
+  },
+  {
+    "library": "breakcore",
+    "songs": 1,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "breakcore",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "breaks",
+    "songs": 10,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "breaks",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "bubblegum",
+    "songs": 15,
+    "albums": 2,
+    "artists": 2,
+    "status": "map",
+    "mapsTo": "bubblegum pop",
+    "why": "Not a MusicBrainz genre. Folded into bubblegum pop."
+  },
+  {
+    "library": "chamber pop",
+    "songs": 13,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "chamber pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "character on cover",
+    "songs": 65,
+    "albums": 3,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "character: n",
+    "songs": 25,
+    "albums": 1,
+    "artists": 0,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "character: uzi doorman",
+    "songs": 16,
+    "albums": 1,
+    "artists": 0,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "character: v",
+    "songs": 24,
+    "albums": 1,
+    "artists": 0,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "charity",
+    "songs": 2,
+    "albums": 1,
+    "artists": 0,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "chillwave",
+    "songs": 16,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "chillwave",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "chiptune",
+    "songs": 137,
+    "albums": 3,
+    "artists": 3,
+    "status": "official",
+    "mapsTo": "chiptune",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "christian hip hop",
+    "songs": 49,
+    "albums": 3,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "christian hip hop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "christian rock",
+    "songs": 11,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "christian rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "christmas",
+    "songs": 15,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "christmas music",
+    "why": "Not a MusicBrainz genre. Folded into christmas music."
+  },
+  {
+    "library": "classical",
+    "songs": 127,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "classical",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "comedy",
+    "songs": 45,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "comedy",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "conscious hip hop",
+    "songs": 49,
+    "albums": 3,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "conscious hip hop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "contemporary christian",
+    "songs": 11,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "contemporary christian",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "contemporary r&b",
+    "songs": 34,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "contemporary r&b",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "country",
+    "songs": 62,
+    "albums": 6,
+    "artists": 5,
+    "status": "official",
+    "mapsTo": "country",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "country rock",
+    "songs": 21,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "country rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dance",
+    "songs": 32,
+    "albums": 15,
+    "artists": 8,
+    "status": "official",
+    "mapsTo": "dance",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dance-pop",
+    "songs": 12,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "dance-pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dancefloor drum and bass",
+    "songs": 2,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "dancefloor drum and bass",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dark ambient",
+    "songs": 14,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "dark ambient",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dark cabaret",
+    "songs": 10,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "dark cabaret",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dark wave",
+    "songs": 37,
+    "albums": 4,
+    "artists": 4,
+    "status": "official",
+    "mapsTo": "dark wave",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "digital hardcore",
+    "songs": 17,
+    "albums": 3,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "digital hardcore",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "disco",
+    "songs": 24,
+    "albums": 3,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "disco",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "dream pop",
+    "songs": 4,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "dream pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "drum",
+    "songs": 1,
+    "albums": 1,
+    "artists": 3,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "dubstep",
+    "songs": 28,
+    "albums": 2,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "dubstep",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "electro",
+    "songs": 54,
+    "albums": 6,
+    "artists": 4,
+    "status": "official",
+    "mapsTo": "electro",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "electro house",
+    "songs": 15,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "electro house",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "electronic",
+    "songs": 482,
+    "albums": 41,
+    "artists": 24,
+    "status": "official",
+    "mapsTo": "electronic",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "electronica",
+    "songs": 14,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "electronica",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "electropop",
+    "songs": 12,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "electropop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "emo",
+    "songs": 15,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "emo",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "emo rap",
+    "songs": 19,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "emo rap",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "eurodance",
+    "songs": 3,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "eurodance",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "experimental",
+    "songs": 31,
+    "albums": 3,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "experimental",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "folk",
+    "songs": 148,
+    "albums": 16,
+    "artists": 13,
+    "status": "official",
+    "mapsTo": "folk",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "folk pop",
+    "songs": 14,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "folk pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "folk rock",
+    "songs": 91,
+    "albums": 7,
+    "artists": 6,
+    "status": "official",
+    "mapsTo": "folk rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "footwork jungle",
+    "songs": 5,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "footwork jungle",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "free improvisation",
+    "songs": 0,
+    "albums": 0,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "free improvisation",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "free jazz",
+    "songs": 0,
+    "albums": 0,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "free jazz",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "funk",
+    "songs": 7,
+    "albums": 1,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "funk",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "future bass",
+    "songs": 13,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "future bass",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "game mod",
+    "songs": 60,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "video game music",
+    "why": "Not a MusicBrainz genre. Folded into video game music."
+  },
+  {
+    "library": "garage rock",
+    "songs": 10,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "garage rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "gospel",
+    "songs": 111,
+    "albums": 14,
+    "artists": 7,
+    "status": "official",
+    "mapsTo": "gospel",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "hard rock",
+    "songs": 14,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "hard rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "hardcore",
+    "songs": 10,
+    "albums": 1,
+    "artists": 0,
+    "status": "map",
+    "mapsTo": "digital hardcore",
+    "why": "Not a MusicBrainz genre. Folded into digital hardcore."
+  },
+  {
+    "library": "hardcore breaks",
+    "songs": 5,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "hardcore breaks",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "hip hop",
+    "songs": 64,
+    "albums": 4,
+    "artists": 3,
+    "status": "official",
+    "mapsTo": "hip hop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "holiday",
+    "songs": 11,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "christmas music",
+    "why": "Not a MusicBrainz genre. Folded into christmas music."
+  },
+  {
+    "library": "idm",
+    "songs": 24,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "idm",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "indie",
+    "songs": 523,
+    "albums": 78,
+    "artists": 55,
+    "status": "umbrella",
+    "mapsTo": "indie",
+    "why": "Kept as a parent. MusicBrainz lists the specific names, not this umbrella."
+  },
+  {
+    "library": "indie pop",
+    "songs": 281,
+    "albums": 26,
+    "artists": 18,
+    "status": "official",
+    "mapsTo": "indie pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "indie rock",
+    "songs": 222,
+    "albums": 22,
+    "artists": 16,
+    "status": "official",
+    "mapsTo": "indie rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "indietronica",
+    "songs": 10,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "indietronica",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "instrumental",
+    "songs": 82,
+    "albums": 10,
+    "artists": 9,
+    "status": "official",
+    "mapsTo": "instrumental",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "j-pop",
+    "songs": 1,
+    "albums": 1,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "j-pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "jazz",
+    "songs": 13,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "jazz",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "juke",
+    "songs": 15,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "juke",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "lo-fi",
+    "songs": 23,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "lo-fi",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "metal",
+    "songs": 2,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "metal",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "minecraft",
+    "songs": 30,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "video game music",
+    "why": "Not a MusicBrainz genre. Folded into video game music."
+  },
+  {
+    "library": "modern",
+    "songs": 80,
+    "albums": 2,
+    "artists": 8,
+    "status": "map",
+    "mapsTo": "modern classical",
+    "why": "Not a MusicBrainz genre. Folded into modern classical."
+  },
+  {
+    "library": "modern classical",
+    "songs": 127,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "modern classical",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "murder drones",
+    "songs": 65,
+    "albums": 3,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "soundtrack",
+    "why": "Not a MusicBrainz genre. Folded into soundtrack."
+  },
+  {
+    "library": "musical",
+    "songs": 61,
+    "albums": 2,
+    "artists": 13,
+    "status": "official",
+    "mapsTo": "musical",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "nerdcore",
+    "songs": 13,
+    "albums": 1,
+    "artists": 0,
+    "status": "official",
+    "mapsTo": "nerdcore",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "new wave",
+    "songs": 26,
+    "albums": 5,
+    "artists": 3,
+    "status": "official",
+    "mapsTo": "new wave",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "noise rock",
+    "songs": 12,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "noise rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "pop",
+    "songs": 628,
+    "albums": 98,
+    "artists": 70,
+    "status": "official",
+    "mapsTo": "pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "pop punk",
+    "songs": 30,
+    "albums": 3,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "pop punk",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "pop rap",
+    "songs": 49,
+    "albums": 3,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "pop rap",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "pop rock",
+    "songs": 129,
+    "albums": 12,
+    "artists": 9,
+    "status": "official",
+    "mapsTo": "pop rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "post-rock",
+    "songs": 7,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "post-rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "power pop",
+    "songs": 25,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "power pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "protogen",
+    "songs": 2,
+    "albums": 1,
+    "artists": 0,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "psychedelic",
+    "songs": 16,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "psychedelic",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "psychedelic rock",
+    "songs": 13,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "psychedelic rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "punk",
+    "songs": 49,
+    "albums": 6,
+    "artists": 5,
+    "status": "official",
+    "mapsTo": "punk",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "rave",
+    "songs": 12,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "rave",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "reggae gospel",
+    "songs": 13,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "gospel",
+    "why": "Not a MusicBrainz genre. Folded into gospel."
+  },
+  {
+    "library": "religious",
+    "songs": 13,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "contemporary christian",
+    "why": "Not a MusicBrainz genre. Folded into contemporary christian."
+  },
+  {
+    "library": "remix",
+    "songs": 30,
+    "albums": 1,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "robot on cover",
+    "songs": 65,
+    "albums": 3,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "rock",
+    "songs": 546,
+    "albums": 56,
+    "artists": 38,
+    "status": "official",
+    "mapsTo": "rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "shoegaze",
+    "songs": 12,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "shoegaze",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "singer-songwriter",
+    "songs": 23,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "singer-songwriter",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "single",
+    "songs": 3,
+    "albums": 2,
+    "artists": 0,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "soul",
+    "songs": 22,
+    "albums": 2,
+    "artists": 2,
+    "status": "official",
+    "mapsTo": "soul",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "soundtrack",
+    "songs": 466,
+    "albums": 23,
+    "artists": 34,
+    "status": "umbrella",
+    "mapsTo": "soundtrack",
+    "why": "Kept as a parent. MusicBrainz lists the specific names, not this umbrella."
+  },
+  {
+    "library": "space rock",
+    "songs": 12,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "space rock",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "swing",
+    "songs": 1,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "swing",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "synth-pop",
+    "songs": 59,
+    "albums": 6,
+    "artists": 4,
+    "status": "official",
+    "mapsTo": "synth-pop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "synthpunk",
+    "songs": 10,
+    "albums": 1,
+    "artists": 0,
+    "status": "map",
+    "mapsTo": "electropunk",
+    "why": "Not a MusicBrainz genre. Folded into electropunk."
+  },
+  {
+    "library": "techno",
+    "songs": 12,
+    "albums": 2,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "techno",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "the elder scrolls",
+    "songs": 60,
+    "albums": 1,
+    "artists": 1,
+    "status": "map",
+    "mapsTo": "video game music",
+    "why": "Not a MusicBrainz genre. Folded into video game music."
+  },
+  {
+    "library": "trip hop",
+    "songs": 12,
+    "albums": 1,
+    "artists": 1,
+    "status": "official",
+    "mapsTo": "trip hop",
+    "why": "MusicBrainz genre"
+  },
+  {
+    "library": "video game music",
+    "songs": 198,
+    "albums": 6,
+    "artists": 6,
+    "status": "umbrella",
+    "mapsTo": "video game music",
+    "why": "Kept as a parent. MusicBrainz lists the specific names, not this umbrella."
+  },
+  {
+    "library": "vocal",
+    "songs": 28,
+    "albums": 2,
+    "artists": 3,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  },
+  {
+    "library": "voiceroid",
+    "songs": 0,
+    "albums": 0,
+    "artists": 1,
+    "status": "drop",
+    "mapsTo": null,
+    "why": "Not a genre (cover tag, fandom, release type, or leftover fragment)."
+  }
+]
