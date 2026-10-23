@@ -86,6 +86,17 @@ public sealed class GenreMemory
     }
 
     /// <summary>
+    /// Forgets the last written genre lists. Original file-tag genres are kept.
+    /// </summary>
+    public void ClearApplied()
+    {
+        lock (_gate)
+        {
+            _file.Applied.Clear();
+        }
+    }
+
+    /// <summary>
     /// Writes the memory file to disk.
     /// </summary>
     public void Save()

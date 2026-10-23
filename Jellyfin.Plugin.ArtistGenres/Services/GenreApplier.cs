@@ -49,6 +49,65 @@ public sealed class GenreApplier
     }
 
     /// <summary>
+    /// Forgets cached lookups, clears genres on the library, then fetches them again from the selected source.
+    /// </summary>
+    public async Task ResetAndApplyAsync(IProgress<double> progress, CancellationToken cancellationToken)
+    {
+        var config = CurrentConfiguration();
+        if (config.Source == GenreSources.Discogs && string.IsNullOrWhiteSpace(config.DiscogsToken))
+        {
+            _logger.LogError("Discogs is selected, but no personal access token is set. Nothing was changed.");
+            progress.Report(100);
+            return;
+        }
+
+        _logger.LogInformation("Artist Genres reset: clearing lookup cache and current genres, then fetching again from {Source}.", config.Source);
+
+        var toWipe = new List<BaseItem>();
+        if (config.UpdateArtists)
+        {
+            toWipe.AddRange(Load(BaseItemKind.MusicArtist));
+        }
+
+        if (config.UpdateAlbums)
+        {
+            toWipe.AddRange(Load(BaseItemKind.MusicAlbum));
+        }
+
+        if (config.UpdateSongs)
+        {
+            toWipe.AddRange(Load(BaseItemKind.Audio));
+        }
+
+        foreach (var item in toWipe)
+        {
+            if (config.KeepOriginalGenres)
+            {
+                _memory.RememberOriginal(item.Id, item.Genres ?? []);
+            }
+        }
+
+        _cache.Clear();
+        _memory.ClearApplied();
+
+        var wipeTotal = Math.Max(1, toWipe.Count);
+        var wiped = 0;
+        foreach (var item in toWipe)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await WipeAsync(item, cancellationToken).ConfigureAwait(false);
+            wiped++;
+            progress.Report(wiped * 15d / wipeTotal);
+        }
+
+        _memory.Save();
+        _cache.Save();
+
+        var applyProgress = new Progress<double>(value => progress.Report(15 + (value * 0.85)));
+        await ApplyAsync(applyProgress, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Looks up the selected source and replaces genres that differ.
     /// </summary>
     public async Task ApplyAsync(IProgress<double> progress, CancellationToken cancellationToken)
@@ -398,6 +457,22 @@ public sealed class GenreApplier
         return string.IsNullOrEmpty(groupPointer)
             ? []
             : await _discogs.GetPointerGenresAsync(groupPointer, mode, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task WipeAsync(BaseItem item, CancellationToken cancellationToken)
+    {
+        if (item.LockedFields.Contains(MetadataField.Genres))
+        {
+            return;
+        }
+
+        if (item.Genres is not { Length: > 0 })
+        {
+            return;
+        }
+
+        item.Genres = [];
+        await item.UpdateToRepositoryAsync(ItemUpdateType.MetadataEdit, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task WriteAsync(BaseItem item, IReadOnlyList<string> genres, PluginConfiguration config, ApplyStats stats, CancellationToken cancellationToken)

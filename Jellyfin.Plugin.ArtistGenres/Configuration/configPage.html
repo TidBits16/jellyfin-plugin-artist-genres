@@ -214,6 +214,15 @@
                     </button>
                 </div>
                 <div class="fieldDescription">Apply runs in the background. The first pass asks the source about each album, about one a second, and later passes reuse what they already fetched.</div>
+
+                <div class="selectContainer" style="max-width: 48em; margin-top: 1.5em;">
+                    <label class="selectLabel" for="artistGenresAdvanced">Advanced</label>
+                    <select is="emby-select" id="artistGenresAdvanced" class="emby-select-withcolor">
+                        <option value="" selected>Choose an action</option>
+                        <option value="reset">Reset All Genres</option>
+                    </select>
+                    <div class="fieldDescription">Reset forgets cached lookups, clears genres on artists, albums, and songs, then fetches them again from the selected source. This takes a while.</div>
+                </div>
             </form>
         </div>
     </div>
@@ -310,7 +319,32 @@
                 });
             }
 
-            function saveConfiguration(applyAfter) {
+            function startNamedTask(taskKey, startedMessage, missingMessage) {
+                ApiClient.getScheduledTasks().then(function (tasks) {
+                    var task = (tasks || []).filter(function (entry) {
+                        return entry.Key === taskKey;
+                    })[0];
+
+                    if (!task) {
+                        Dashboard.hideLoadingMsg();
+                        Dashboard.alert(missingMessage);
+                        return;
+                    }
+
+                    ApiClient.startScheduledTask(task.Id).then(function () {
+                        Dashboard.hideLoadingMsg();
+                        Dashboard.alert(startedMessage);
+                    }, function () {
+                        Dashboard.hideLoadingMsg();
+                        Dashboard.alert(missingMessage);
+                    });
+                }, function () {
+                    Dashboard.hideLoadingMsg();
+                    Dashboard.alert(missingMessage);
+                });
+            }
+
+            function saveConfiguration(after) {
                 Dashboard.showLoadingMsg();
                 var source = chosenSource(document.getElementById("genreSource").value);
 
@@ -325,33 +359,25 @@
                     config.DiscogsFields = document.getElementById("discogsFields").value || "Styles";
 
                     ApiClient.updatePluginConfiguration(pluginId, config).then(function (result) {
-                        if (!applyAfter) {
+                        if (!after) {
                             Dashboard.processPluginConfigurationUpdateResult(result);
                             return;
                         }
 
-                        ApiClient.getScheduledTasks().then(function (tasks) {
-                            var task = (tasks || []).filter(function (entry) {
-                                return entry.Key === "ArtistGenresApply";
-                            })[0];
+                        if (after === "reset") {
+                            startNamedTask(
+                                "ArtistGenresReset",
+                                "Settings saved. Genres are being cleared and fetched again. Progress is on the Scheduled Tasks page.",
+                                "Settings saved. Restart Jellyfin once, then run Reset artist genres from Scheduled Tasks."
+                            );
+                            return;
+                        }
 
-                            if (!task) {
-                                Dashboard.hideLoadingMsg();
-                                Dashboard.alert("Settings saved. Restart Jellyfin once, then run Apply artist genres from Scheduled Tasks.");
-                                return;
-                            }
-
-                            ApiClient.startScheduledTask(task.Id).then(function () {
-                                Dashboard.hideLoadingMsg();
-                                Dashboard.alert("Settings saved. Genres are being applied. Progress is on the Scheduled Tasks page.");
-                            }, function () {
-                                Dashboard.hideLoadingMsg();
-                                Dashboard.alert("Settings saved, but the apply task did not start. Run Apply artist genres from Scheduled Tasks.");
-                            });
-                        }, function () {
-                            Dashboard.hideLoadingMsg();
-                            Dashboard.alert("Settings saved. Run Apply artist genres from Scheduled Tasks.");
-                        });
+                        startNamedTask(
+                            "ArtistGenresApply",
+                            "Settings saved. Genres are being applied. Progress is on the Scheduled Tasks page.",
+                            "Settings saved. Restart Jellyfin once, then run Apply artist genres from Scheduled Tasks."
+                        );
                     }, function () {
                         Dashboard.hideLoadingMsg();
                         Dashboard.alert("Artist Genres settings could not be saved.");
@@ -376,7 +402,21 @@
             });
 
             document.getElementById("artistGenresApply").addEventListener("click", function () {
-                saveConfiguration(true);
+                saveConfiguration("apply");
+            });
+
+            document.getElementById("artistGenresAdvanced").addEventListener("change", function (event) {
+                var action = event.target.value;
+                event.target.value = "";
+                if (action !== "reset") {
+                    return;
+                }
+
+                if (!window.confirm("Reset all genres? This forgets cached lookups, clears genres on the library, and fetches them again from the selected source. It takes a while.")) {
+                    return;
+                }
+
+                saveConfiguration("reset");
             });
         })();
     </script>

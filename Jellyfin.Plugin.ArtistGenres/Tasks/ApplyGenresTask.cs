@@ -60,6 +60,61 @@ public sealed class ApplyGenresTask : IScheduledTask
 }
 
 /// <summary>
+/// Clears the lookup cache and current genres, then fetches them again from the selected source.
+/// </summary>
+public sealed class ResetGenresTask : IScheduledTask
+{
+    private readonly GenreApplier _applier;
+
+    private readonly ILogger<ResetGenresTask> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResetGenresTask"/> class.
+    /// </summary>
+    public ResetGenresTask(GenreApplier applier, ILogger<ResetGenresTask> logger)
+    {
+        _applier = applier;
+        _logger = logger;
+    }
+
+    /// <inheritdoc />
+    public string Name => "Reset artist genres";
+
+    /// <inheritdoc />
+    public string Key => "ArtistGenresReset";
+
+    /// <inheritdoc />
+    public string Description => "Clears cached lookups and current genres, then fetches them again from the source selected in the Artist Genres plugin.";
+
+    /// <inheritdoc />
+    public string Category => "Library";
+
+    /// <inheritdoc />
+    public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
+    {
+        return [];
+    }
+
+    /// <inheritdoc />
+    public async Task ExecuteAsync(IProgress<double> progress, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _applier.ResetAndApplyAsync(progress, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Reset artist genres failed.");
+            throw;
+        }
+    }
+}
+
+/// <summary>
 /// Puts the last applied genres back after a library scan re-reads the file tags.
 /// </summary>
 public sealed class ReapplyGenresPostScanTask : MediaBrowser.Controller.Library.ILibraryPostScanTask

@@ -97,6 +97,17 @@ public sealed class GenreCache
     }
 
     /// <summary>
+    /// Drops every cached lookup so the next apply asks MusicBrainz and Discogs again.
+    /// </summary>
+    public void Clear()
+    {
+        lock (_gate)
+        {
+            _file = new GenreCacheFile();
+        }
+    }
+
+    /// <summary>
     /// Writes the cache to disk.
     /// </summary>
     public void Save()
