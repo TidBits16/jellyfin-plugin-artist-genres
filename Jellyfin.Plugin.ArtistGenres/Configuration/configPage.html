@@ -41,21 +41,21 @@
     <div data-role="content">
         <div class="content-primary">
             <h1>Artist Genres</h1>
-            <p class="artistGenresLead">Pick one source. Apply replaces the genres on artists, albums, and songs with that source's names. Names already on an item are removed.</p>
+            <p class="artistGenresLead">MusicBrainz is the default. Apply replaces genres with those names, folded into one spelling, and adds a broader parent so similar songs are easier to find.</p>
 
             <form id="artistGenresConfigurationForm">
                 <div class="selectContainer">
                     <label class="selectLabel" for="genreSource">Genre source</label>
                     <select is="emby-select" id="genreSource" class="emby-select-withcolor">
-                        <option value="Discogs" selected>Discogs</option>
-                        <option value="MusicBrainz">MusicBrainz</option>
+                        <option value="MusicBrainz" selected>MusicBrainz</option>
+                        <option value="Discogs">Discogs</option>
                     </select>
-                    <div class="fieldDescription" id="genreSourceDescription">I prefer less genres but more consistency (best for 1-10,000 songs).</div>
+                    <div class="fieldDescription" id="genreSourceDescription">I have an unreasonable amount of songs but care most about genre accuracy (best for &gt;10,000 songs).</div>
                 </div>
 
-                <div id="musicBrainzSettings" class="artistGenresPanel" hidden>
+                <div id="musicBrainzSettings" class="artistGenresPanel">
                     <h2>MusicBrainz</h2>
-                    <p class="artistGenresSummary">I have an unreasonable amount of songs but care most about genre accuracy (best for &gt;10,000 songs).</p>
+                    <p class="artistGenresSummary">Writes MusicBrainz names. Game, hip-hop, and Film Scores become video game music, hip hop, and soundtrack. indie rock also gets rock and indie, so filters catch more. christmas and christian stay separate. An album MusicBrainz does not tag keeps the artist's names, then the original file tags.</p>
 
                     <div class="inputContainer">
                         <label class="inputLabel" for="mbServer">Server</label>
@@ -78,15 +78,15 @@
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
                             <input is="emby-checkbox" id="mbInherit" type="checkbox" />
-                            <span>Songs inherit the album</span>
+                            <span>Songs also keep the artist</span>
                         </label>
-                        <div class="fieldDescription">Songs include the artist's genres as well as the album's. Turn this off to leave artist genres off the songs.</div>
+                        <div class="fieldDescription">Songs get the album's names first, then the artist's, so similar tracks meet. A Christmas album can still list christmas. Turn this off to use only the album, or the artist when the album has none.</div>
                     </div>
 
                     <div class="inputContainer">
                         <label class="inputLabel" for="mbMaxGenres">Maximum genres</label>
                         <input is="emby-input" data-panel="MusicBrainz" data-field="maxGenres" type="number" min="0" max="30" />
-                        <div class="fieldDescription">How many names to keep, in vote order. 0 keeps all of them.</div>
+                        <div class="fieldDescription">How many names to keep, specific first, then broader parents. 0 keeps all of them.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -106,7 +106,7 @@
                             <input is="emby-checkbox" data-panel="MusicBrainz" data-field="updateSongs" type="checkbox" />
                             <span>Songs</span>
                         </label>
-                        <div class="fieldDescription">These three are the items that get rewritten.</div>
+                        <div class="fieldDescription">These three are replaced with the normalized MusicBrainz names.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -114,7 +114,7 @@
                             <input is="emby-checkbox" data-panel="MusicBrainz" data-field="fallback" type="checkbox" />
                             <span>Use Discogs when MusicBrainz has nothing</span>
                         </label>
-                        <div class="fieldDescription">Needs the Discogs token from the other section. An item MusicBrainz does tag is left on MusicBrainz names.</div>
+                        <div class="fieldDescription">Needs the Discogs token from the other section. After that, original file tags are used so game scores and small digital albums are not left blank.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -122,7 +122,7 @@
                             <input is="emby-checkbox" data-panel="MusicBrainz" data-field="keepOriginal" type="checkbox" />
                             <span>Keep the original file genres</span>
                         </label>
-                        <div class="fieldDescription">Saves the genres from before the first apply. They stay in the plugin's notes and are not written back onto the items.</div>
+                        <div class="fieldDescription">Saves the genres from before the first apply. Those names are written back, normalized, only when MusicBrainz has nothing for that item.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -134,7 +134,7 @@
                     </div>
                 </div>
 
-                <div id="discogsSettings" class="artistGenresPanel">
+                <div id="discogsSettings" class="artistGenresPanel" hidden>
                     <h2>Discogs</h2>
                     <p class="artistGenresSummary">I prefer less genres but more consistency (best for 1-10,000 songs).</p>
 
@@ -193,7 +193,7 @@
                             <input is="emby-checkbox" data-panel="Discogs" data-field="keepOriginal" type="checkbox" />
                             <span>Keep the original file genres</span>
                         </label>
-                        <div class="fieldDescription">Saves the genres from before the first apply. They stay in the plugin's notes and are not written back onto the items.</div>
+                        <div class="fieldDescription">Saves the genres from before the first apply. Those names are written back, normalized, only when MusicBrainz has nothing for that item.</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -228,7 +228,7 @@
             };
 
             function chosenSource(value) {
-                return value === "MusicBrainz" ? "MusicBrainz" : "Discogs";
+                return value === "Discogs" ? "Discogs" : "MusicBrainz";
             }
 
             function pageElement() {
@@ -284,7 +284,7 @@
                 config.ReapplyAfterLibraryScan = field(panel, "reapply").checked;
 
                 var maxGenres = parseInt(field(panel, "maxGenres").value, 10);
-                config.MaxGenres = isNaN(maxGenres) || maxGenres < 0 ? 5 : maxGenres;
+                config.MaxGenres = isNaN(maxGenres) || maxGenres < 0 ? 8 : maxGenres;
             }
 
             function readNumber(id, fallback) {

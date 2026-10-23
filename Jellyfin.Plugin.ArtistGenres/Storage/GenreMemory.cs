@@ -53,6 +53,19 @@ public sealed class GenreMemory
     }
 
     /// <summary>
+    /// Returns the genres stored before the first apply.
+    /// </summary>
+    public IReadOnlyList<string> OriginalFor(Guid itemId)
+    {
+        lock (_gate)
+        {
+            return _file.Original.TryGetValue(itemId.ToString("N"), out var genres)
+                ? genres
+                : [];
+        }
+    }
+
+    /// <summary>
     /// Returns the genre lists last written, keyed by item id.
     /// </summary>
     public IReadOnlyList<(Guid ItemId, string[] Genres)> AppliedSnapshot()

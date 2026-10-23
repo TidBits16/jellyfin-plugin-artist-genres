@@ -20,6 +20,14 @@ public sealed class MusicBrainzGenreClient
 
     private readonly ILogger<MusicBrainzGenreClient> _logger;
 
+    private static readonly HashSet<string> TagDenylist = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "seen live", "favorites", "favourite", "favourites", "check", "beautiful",
+        "love", "awesome", "albums i own", "all", "good", "sad", "happy", "chill",
+        "relax", "party", "sexy", "funny", "spotify", "youtube", "american",
+        "british", "canadian", "male vocalists", "female vocalists", "under 2000 listeners"
+    };
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MusicBrainzGenreClient"/> class.
     /// </summary>
@@ -105,13 +113,13 @@ public sealed class MusicBrainzGenreClient
         }
 
         var votes = Math.Max(0, minimumVotes);
-        var key = $"mb:{entity}:{musicBrainzId}:{votes}";
+        var key = $"mb:{entity}:{musicBrainzId}:{votes}:gt";
         if (_cache.TryGetGenres(key, out var cached))
         {
             return cached;
         }
 
-        var url = BuildUrl($"{entity}/{musicBrainzId}?inc=genres&fmt=json");
+        var url = BuildUrl($"{entity}/{musicBrainzId}?inc=genres+tags&fmt=json");
         if (url is null)
         {
             return [];
@@ -124,24 +132,39 @@ public sealed class MusicBrainzGenreClient
         }
 
         var names = ParseGenres(body, votes);
+        if (names.Count == 0)
+        {
+            names = ParseTags(body, votes);
+        }
+
         _cache.SetGenres(key, names);
         return names;
     }
 
     private static IReadOnlyList<string> ParseGenres(string body, int minimumVotes)
     {
+        return ParseNamedCounts(body, "genres", minimumVotes, skipDenylist: false);
+    }
+
+    private static IReadOnlyList<string> ParseTags(string body, int minimumVotes)
+    {
+        return ParseNamedCounts(body, "tags", minimumVotes, skipDenylist: true);
+    }
+
+    private static IReadOnlyList<string> ParseNamedCounts(string body, string property, int minimumVotes, bool skipDenylist)
+    {
         try
         {
             using var document = JsonDocument.Parse(body);
-            if (!document.RootElement.TryGetProperty("genres", out var genres) || genres.ValueKind != JsonValueKind.Array)
+            if (!document.RootElement.TryGetProperty(property, out var values) || values.ValueKind != JsonValueKind.Array)
             {
                 return [];
             }
 
             var ranked = new List<(int Count, string Name)>();
-            foreach (var genre in genres.EnumerateArray())
+            foreach (var entry in values.EnumerateArray())
             {
-                if (!genre.TryGetProperty("name", out var nameProperty))
+                if (!entry.TryGetProperty("name", out var nameProperty))
                 {
                     continue;
                 }
@@ -152,7 +175,13 @@ public sealed class MusicBrainzGenreClient
                     continue;
                 }
 
-                var count = genre.TryGetProperty("count", out var countProperty) && countProperty.TryGetInt32(out var parsed)
+                var trimmed = name.Trim();
+                if (skipDenylist && IsJunkTag(trimmed))
+                {
+                    continue;
+                }
+
+                var count = entry.TryGetProperty("count", out var countProperty) && countProperty.TryGetInt32(out var parsed)
                     ? parsed
                     : 0;
                 if (count < minimumVotes)
@@ -160,7 +189,7 @@ public sealed class MusicBrainzGenreClient
                     continue;
                 }
 
-                ranked.Add((count, name.Trim()));
+                ranked.Add((count, trimmed));
             }
 
             return ranked
@@ -172,6 +201,24 @@ public sealed class MusicBrainzGenreClient
         {
             return [];
         }
+    }
+
+    private static bool IsJunkTag(string name)
+    {
+        if (TagDenylist.Contains(name) || name.Length > 40)
+        {
+            return true;
+        }
+
+        if (name.EndsWith("s", StringComparison.OrdinalIgnoreCase)
+            && name.Length <= 5
+            && int.TryParse(name.AsSpan(0, name.Length - 1), out _))
+        {
+            return true;
+        }
+
+        return name.Contains("listener", StringComparison.OrdinalIgnoreCase)
+            || name.Contains("discovered", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string? ParseDiscogsPointer(string body)

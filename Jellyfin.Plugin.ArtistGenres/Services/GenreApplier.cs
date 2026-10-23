@@ -68,12 +68,19 @@ public sealed class GenreApplier
         var albumSource = new Dictionary<Guid, IReadOnlyList<string>>();
         var artistLabels = new Dictionary<Guid, IReadOnlyList<string>>();
         var artistsByName = new Dictionary<string, MusicArtist>(StringComparer.OrdinalIgnoreCase);
-        var songGenres = new Dictionary<Guid, IReadOnlyList<string>>();
         var total = Math.Max(1, albums.Count + songs.Count + artists.Count);
         var done = 0;
 
         try
         {
+            foreach (var item in artists)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var artist = (MusicArtist)item;
+                artistsByName.TryAdd(artist.Name, artist);
+                artistLabels[artist.Id] = GenreCanonicalizer.Canonicalize(await ResolveArtistDirectAsync(artist, config, cancellationToken).ConfigureAwait(false));
+            }
+
             foreach (var item in albums)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -83,12 +90,50 @@ public sealed class GenreApplier
                 progress.Report(done * 100d / total);
             }
 
+            foreach (var item in albums)
+            {
+                var album = (MusicAlbum)item;
+                if (albumSource.TryGetValue(album.Id, out var known) && known.Count > 0)
+                {
+                    continue;
+                }
+
+                var names = album.AlbumArtists is { Count: > 0 } ? album.AlbumArtists : album.Artists;
+                var filled = LabelsFor(names ?? [], artistLabels, artistsByName);
+                if (filled.Count == 0 && config.KeepOriginalGenres)
+                {
+                    filled = GenreCanonicalizer.Canonicalize(_memory.OriginalFor(album.Id));
+                }
+
+                albumSource[album.Id] = filled;
+            }
+
             foreach (var item in artists)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var artist = (MusicArtist)item;
-                artistsByName.TryAdd(artist.Name, artist);
-                artistLabels[artist.Id] = GenreCanonicalizer.Canonicalize(await ResolveArtistAsync(artist, albums, albumSource, config, cancellationToken).ConfigureAwait(false));
+                if (artistLabels.TryGetValue(artist.Id, out var known) && known.Count > 0)
+                {
+                    continue;
+                }
+
+                var fromAlbums = Aggregate(AlbumsForArtist(artist, albums).Select(album =>
+                    albumSource.TryGetValue(album.Id, out var genres) ? genres : []));
+                if (fromAlbums.Count == 0 && config.FallbackToOtherSource && config.Source == GenreSources.Discogs)
+                {
+                    var fallbackId = ProviderId(artist, "MusicBrainzArtist");
+                    if (fallbackId is not null)
+                    {
+                        fromAlbums = GenreCanonicalizer.Canonicalize(
+                            await _musicBrainz.GetArtistGenresAsync(fallbackId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false));
+                    }
+                }
+
+                artistLabels[artist.Id] = fromAlbums.Count > 0
+                    ? fromAlbums
+                    : config.KeepOriginalGenres
+                        ? GenreCanonicalizer.Canonicalize(_memory.OriginalFor(artist.Id))
+                        : [];
             }
 
             foreach (var item in songs)
@@ -97,7 +142,11 @@ public sealed class GenreApplier
                 var song = (AudioItem)item;
                 var includeArtist = config.Source == GenreSources.MusicBrainz && config.MusicBrainzInheritAlbumGenres;
                 var genres = GenresForSong(song, albumSource, artistLabels, artistsByName, includeArtist);
-                songGenres[song.Id] = genres;
+                if (genres.Count == 0 && config.KeepOriginalGenres)
+                {
+                    genres = GenreCanonicalizer.Canonicalize(_memory.OriginalFor(song.Id));
+                }
+
                 if (config.UpdateSongs)
                 {
                     await WriteAsync(song, genres, config, stats, cancellationToken).ConfigureAwait(false);
@@ -124,10 +173,8 @@ public sealed class GenreApplier
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var artist = (MusicArtist)item;
-                    var fromSongs = Aggregate(SongsForArtist(artist, songs).Select(song =>
-                        songGenres.TryGetValue(song.Id, out var genres) ? genres : []));
                     var labels = artistLabels.TryGetValue(artist.Id, out var known) ? known : [];
-                    await WriteAsync(artist, Combine(labels, fromSongs), config, stats, cancellationToken).ConfigureAwait(false);
+                    await WriteAsync(artist, labels, config, stats, cancellationToken).ConfigureAwait(false);
                     done++;
                     progress.Report(done * 100d / total);
                 }
@@ -216,12 +263,13 @@ public sealed class GenreApplier
             fromAlbum = found;
         }
 
-        if (!includeArtist)
+        var labels = LabelsFor(ArtistNames(song), artistLabels, artistsByName);
+        if (fromAlbum.Count == 0)
         {
-            return fromAlbum;
+            return labels;
         }
 
-        return Combine(LabelsFor(ArtistNames(song), artistLabels, artistsByName), fromAlbum);
+        return includeArtist ? Combine(fromAlbum, labels) : fromAlbum;
     }
 
     private static IReadOnlyList<string> LabelsFor(
@@ -253,26 +301,6 @@ public sealed class GenreApplier
         return song.Artists ?? [];
     }
 
-    private static IEnumerable<AudioItem> SongsForArtist(MusicArtist artist, IReadOnlyList<BaseItem> songs)
-    {
-        foreach (var item in songs)
-        {
-            if (item is not AudioItem song)
-            {
-                continue;
-            }
-
-            foreach (var name in ArtistNames(song))
-            {
-                if (string.Equals(name, artist.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    yield return song;
-                    break;
-                }
-            }
-        }
-    }
-
     private static IReadOnlyList<string> Combine(params IEnumerable<string>?[] groups)
     {
         var list = new List<string>();
@@ -296,37 +324,20 @@ public sealed class GenreApplier
         return list;
     }
 
-    private async Task<IReadOnlyList<string>> ResolveArtistAsync(
+    private async Task<IReadOnlyList<string>> ResolveArtistDirectAsync(
         MusicArtist artist,
-        IReadOnlyList<BaseItem> albums,
-        IReadOnlyDictionary<Guid, IReadOnlyList<string>> albumGenres,
         PluginConfiguration config,
         CancellationToken cancellationToken)
     {
-        if (config.Source == GenreSources.MusicBrainz)
+        if (config.Source != GenreSources.MusicBrainz)
         {
-            var artistId = ProviderId(artist, "MusicBrainzArtist");
-            if (artistId is not null)
-            {
-                var direct = await _musicBrainz.GetArtistGenresAsync(artistId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
-                if (direct.Count > 0)
-                {
-                    return direct;
-                }
-            }
+            return [];
         }
 
-        var fromAlbums = Aggregate(AlbumsForArtist(artist, albums).Select(album =>
-            albumGenres.TryGetValue(album.Id, out var genres) ? genres : []));
-        if (fromAlbums.Count > 0 || !config.FallbackToOtherSource || config.Source != GenreSources.Discogs)
-        {
-            return fromAlbums;
-        }
-
-        var fallbackId = ProviderId(artist, "MusicBrainzArtist");
-        return fallbackId is null
-            ? fromAlbums
-            : await _musicBrainz.GetArtistGenresAsync(fallbackId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
+        var artistId = ProviderId(artist, "MusicBrainzArtist");
+        return artistId is null
+            ? []
+            : await _musicBrainz.GetArtistGenresAsync(artistId, config.MusicBrainzMinimumVotes, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<IReadOnlyList<string>> GenresForAlbumAsync(MusicAlbum album, string source, PluginConfiguration config, CancellationToken cancellationToken)

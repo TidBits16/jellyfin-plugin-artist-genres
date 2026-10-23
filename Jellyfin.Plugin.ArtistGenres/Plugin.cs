@@ -33,7 +33,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     public override Guid Id => Guid.Parse("c4e8a1d7-5b39-4f6a-8e2c-91d0f7a4b6e3");
 
     /// <inheritdoc />
-    public override string Description => "Write MusicBrainz or Discogs genres across artists, albums, and songs.";
+    public override string Description => "Write normalized MusicBrainz or Discogs genres across artists, albums, and songs.";
 
     /// <summary>
     /// Gets the folder that holds the genre cache and the original file-tag genres.

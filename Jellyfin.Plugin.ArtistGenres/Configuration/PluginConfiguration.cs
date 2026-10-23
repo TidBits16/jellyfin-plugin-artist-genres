@@ -34,14 +34,14 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     public PluginConfiguration()
     {
-        Source = GenreSources.Discogs;
+        Source = GenreSources.MusicBrainz;
         UpdateArtists = true;
         UpdateAlbums = true;
         UpdateSongs = true;
         FallbackToOtherSource = true;
         KeepOriginalGenres = true;
         ReapplyAfterLibraryScan = true;
-        MaxGenres = 5;
+        MaxGenres = 8;
 
         MusicBrainzServer = "https://musicbrainz.org";
         MusicBrainzContact = string.Empty;
