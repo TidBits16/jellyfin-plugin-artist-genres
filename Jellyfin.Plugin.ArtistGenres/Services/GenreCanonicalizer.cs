@@ -111,7 +111,11 @@ internal static class GenreCanonicalizer
     {
         "ballad opera",
         "cumbia chilena",
+        "dream pop",
+        "hip hop",
         "industrial musical",
+        "j-pop",
+        "k-pop",
         "nueva canción chilena",
         "opera-ballet",
         "rock musical",
@@ -138,10 +142,7 @@ internal static class GenreCanonicalizer
         ["conscious hip hop"] = ["hip hop"],
         ["bedroom pop"] = ["pop"],
         ["art pop"] = ["pop"],
-        ["dream pop"] = ["pop"],
         ["rock musical"] = ["musical"],
-        ["k-pop"] = ["pop"],
-        ["j-pop"] = ["pop"],
         ["rap"] = ["hip hop"],
     };
 

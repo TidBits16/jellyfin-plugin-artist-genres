@@ -1,6 +1,6 @@
 name: "Artist Genres"
 guid: "c4e8a1d7-5b39-4f6a-8e2c-91d0f7a4b6e3"
-version: "0.1.9.0"
+version: "0.1.10.0"
 targetAbi: "12.0.0.0"
 framework: "net10.0"
 owner: "dangerdrive"
@@ -9,4 +9,4 @@ description: "Write one genre vocabulary onto artists, albums, and songs."
 category: "Music"
 artifacts:
   - "Jellyfin.Plugin.ArtistGenres.dll"
-changelog: "christian hip hop is stored as christian and hip hop. christian rock is christian and rock."
+changelog: "dream pop, k-pop, and hip hop stay as their own names."

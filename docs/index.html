@@ -85,7 +85,7 @@
 <body>
   <main>
     <h1>Accepted genres</h1>
-    <p class="lede">Names the Artist Genres plugin will write. Combined names such as emo pop and christian hip hop are stored as the separate names (emo and pop, christian and hip hop). christmas music stays as its own name.</p>
+    <p class="lede">Names the Artist Genres plugin will write. Combined names such as emo pop and christian hip hop are stored as the separate names (emo and pop, christian and hip hop). Unique names such as dream pop, k-pop, and hip hop stay as they are.</p>
     <input id="query" type="search" placeholder="Search genres…" autocomplete="off" />
     <div class="meta">
       <span id="count"></span>
@@ -106,8 +106,9 @@
     const PAGE_SIZE = 50;
     const UMBRELLAS = new Set(["indie", "alternative", "soundtrack", "video game music", "rap", "christian"]);
     const KEEP_WHOLE = new Set([
-      "ballad opera", "cumbia chilena", "industrial musical", "nueva canción chilena",
-      "opera-ballet", "rock musical", "rock opera", "western classical", "western swing"
+      "ballad opera", "cumbia chilena", "dream pop", "hip hop", "industrial musical",
+      "j-pop", "k-pop", "nueva canción chilena", "opera-ballet", "rock musical",
+      "rock opera", "western classical", "western swing"
     ]);
     const PIECE_ALIASES = { rap: true, "hip-hop": true, hiphop: true };
     let names = [];
