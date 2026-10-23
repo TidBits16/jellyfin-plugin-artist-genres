@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace Jellyfin.Plugin.ArtistGenres.Tasks;
 
 /// <summary>
-/// Manual task that writes the selected source's genres onto the music library.
+/// Scheduled task that writes the selected source's genres onto the music library.
 /// </summary>
 public sealed class ApplyGenresTask : IScheduledTask
 {
@@ -32,12 +32,19 @@ public sealed class ApplyGenresTask : IScheduledTask
     public string Description => "Rewrites music genres from the source selected in the Artist Genres plugin.";
 
     /// <inheritdoc />
-    public string Category => "Library";
+    public string Category => "DangerDrive";
 
     /// <inheritdoc />
     public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
     {
-        return [];
+        return
+        [
+            new TaskTriggerInfo
+            {
+                Type = TaskTriggerInfoType.IntervalTrigger,
+                IntervalTicks = TimeSpan.FromHours(24).Ticks
+            }
+        ];
     }
 
     /// <inheritdoc />
@@ -54,61 +61,6 @@ public sealed class ApplyGenresTask : IScheduledTask
         catch (Exception exception)
         {
             _logger.LogError(exception, "Apply artist genres failed.");
-            throw;
-        }
-    }
-}
-
-/// <summary>
-/// Clears the lookup cache and current genres, then fetches them again from the selected source.
-/// </summary>
-public sealed class ResetGenresTask : IScheduledTask
-{
-    private readonly GenreApplier _applier;
-
-    private readonly ILogger<ResetGenresTask> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResetGenresTask"/> class.
-    /// </summary>
-    public ResetGenresTask(GenreApplier applier, ILogger<ResetGenresTask> logger)
-    {
-        _applier = applier;
-        _logger = logger;
-    }
-
-    /// <inheritdoc />
-    public string Name => "Reset artist genres";
-
-    /// <inheritdoc />
-    public string Key => "ArtistGenresReset";
-
-    /// <inheritdoc />
-    public string Description => "Clears cached lookups and current genres, then fetches them again from the source selected in the Artist Genres plugin.";
-
-    /// <inheritdoc />
-    public string Category => "Library";
-
-    /// <inheritdoc />
-    public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
-    {
-        return [];
-    }
-
-    /// <inheritdoc />
-    public async Task ExecuteAsync(IProgress<double> progress, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await _applier.ResetAndApplyAsync(progress, cancellationToken).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Reset artist genres failed.");
             throw;
         }
     }

@@ -365,18 +365,28 @@
                         }
 
                         if (after === "reset") {
-                            startNamedTask(
-                                "ArtistGenresReset",
-                                "Settings saved. Genres are being cleared and fetched again. Progress is on the Scheduled Tasks page.",
-                                "Settings saved. Restart Jellyfin once, then run Reset artist genres from Scheduled Tasks."
-                            );
+                            ApiClient.ajax({
+                                type: "POST",
+                                url: ApiClient.getUrl("ArtistGenres/Reset")
+                            }).then(function () {
+                                Dashboard.hideLoadingMsg();
+                                Dashboard.alert("Settings saved. Genres are being cleared and fetched again.");
+                            }, function (error) {
+                                Dashboard.hideLoadingMsg();
+                                if (error && error.status === 409) {
+                                    Dashboard.alert("A reset is already running.");
+                                    return;
+                                }
+
+                                Dashboard.alert("Settings saved, but reset did not start. Restart Jellyfin once, then try Reset All Genres again.");
+                            });
                             return;
                         }
 
                         startNamedTask(
                             "ArtistGenresApply",
-                            "Settings saved. Genres are being applied. Progress is on the Scheduled Tasks page.",
-                            "Settings saved. Restart Jellyfin once, then run Apply artist genres from Scheduled Tasks."
+                            "Settings saved. Genres are being applied. Progress is under Scheduled Tasks → DangerDrive.",
+                            "Settings saved. Restart Jellyfin once, then run Apply artist genres from Scheduled Tasks → DangerDrive."
                         );
                     }, function () {
                         Dashboard.hideLoadingMsg();

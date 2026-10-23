@@ -24,8 +24,8 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<MusicBrainzGenreClient>();
         serviceCollection.AddSingleton<DiscogsGenreClient>();
         serviceCollection.AddSingleton<GenreApplier>();
+        serviceCollection.AddSingleton<GenreResetRunner>();
         serviceCollection.AddSingleton<IScheduledTask, ApplyGenresTask>();
-        serviceCollection.AddSingleton<IScheduledTask, ResetGenresTask>();
         serviceCollection.AddSingleton<ILibraryPostScanTask, ReapplyGenresPostScanTask>();
     }
 }
