@@ -32,7 +32,7 @@ internal static class GenreCanonicalizer
         ["insturmental"] = ["instrumental"],
         ["hip-hop"] = ["hip hop"],
         ["hiphop"] = ["hip hop"],
-        ["rap"] = ["hip hop"],
+        ["rap"] = ["rap"],
         ["darkwave"] = ["dark wave"],
         ["ai-generated"] = ["ai generated"],
         ["ai generated"] = ["ai generated"],
@@ -44,7 +44,7 @@ internal static class GenreCanonicalizer
         ["rhythm and blues"] = ["r&b"],
         ["synthpop"] = ["synth-pop"],
         ["synth pop"] = ["synth-pop"],
-        ["alt pop"] = ["alt-pop"],
+        ["alt pop"] = ["alternative pop"],
         ["kpop"] = ["k-pop"],
         ["k pop"] = ["k-pop"],
         ["jpop"] = ["j-pop"],
@@ -107,27 +107,28 @@ internal static class GenreCanonicalizer
         ["videogamemusic"] = ["video game music"],
     };
 
+    private static readonly HashSet<string> KeepWhole = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "ballad opera",
+        "cumbia chilena",
+        "industrial musical",
+        "nueva canción chilena",
+        "opera-ballet",
+        "rock musical",
+        "rock opera",
+        "western classical",
+        "western swing"
+    };
+
     private static readonly Dictionary<string, string[]> Parents = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["indie pop"] = ["indie", "pop"],
-        ["indie rock"] = ["indie", "rock"],
-        ["indie folk"] = ["indie", "folk"],
-        ["alternative rock"] = ["alternative", "rock"],
-        ["alternative pop"] = ["alternative", "pop"],
-        ["alternative pop"] = ["alternative", "pop"],
         ["christian hip hop"] = ["hip hop"],
         ["christian rock"] = ["rock"],
-        ["pop rock"] = ["pop", "rock"],
-        ["pop rap"] = ["hip hop", "pop"],
-        ["folk rock"] = ["folk", "rock"],
-        ["folk pop"] = ["folk", "pop"],
-        ["country rock"] = ["country", "rock"],
         ["video game music"] = ["soundtrack"],
         ["chiptune"] = ["electronic"],
         ["synth-pop"] = ["pop", "electronic"],
         ["electropop"] = ["pop", "electronic"],
         ["electro"] = ["electronic"],
-        ["electro house"] = ["electronic"],
         ["house"] = ["electronic"],
         ["dubstep"] = ["electronic"],
         ["future bass"] = ["electronic"],
@@ -137,13 +138,13 @@ internal static class GenreCanonicalizer
         ["vocal jazz"] = ["jazz"],
         ["trap"] = ["hip hop"],
         ["conscious hip hop"] = ["hip hop"],
-        ["emo rap"] = ["hip hop"],
         ["bedroom pop"] = ["pop"],
         ["art pop"] = ["pop"],
         ["dream pop"] = ["pop"],
         ["rock musical"] = ["musical"],
         ["k-pop"] = ["pop"],
         ["j-pop"] = ["pop"],
+        ["rap"] = ["hip hop"],
     };
 
     /// <summary>
@@ -181,18 +182,24 @@ internal static class GenreCanonicalizer
                         continue;
                     }
 
-                    Add(list, seen, allowed, mapped.FromAlias);
-                    if (!Parents.TryGetValue(allowed, out var parents))
+                    var written = SplitCompound(allowed);
+                    var split = written.Count > 1
+                        || (written.Count == 1 && !string.Equals(written[0], allowed, StringComparison.OrdinalIgnoreCase));
+                    foreach (var nameToWrite in written)
                     {
-                        continue;
-                    }
-
-                    foreach (var parent in parents)
-                    {
-                        var parentName = GenreLexicon.CanonicalName(parent);
-                        if (parentName is not null)
+                        Add(list, seen, nameToWrite, mapped.FromAlias || split);
+                        if (!Parents.TryGetValue(nameToWrite, out var parents))
                         {
-                            Add(list, seen, parentName, fromAlias: true);
+                            continue;
+                        }
+
+                        foreach (var parent in parents)
+                        {
+                            var parentName = GenreLexicon.CanonicalName(parent);
+                            if (parentName is not null)
+                            {
+                                Add(list, seen, parentName, fromAlias: true);
+                            }
                         }
                     }
                 }
@@ -212,6 +219,136 @@ internal static class GenreCanonicalizer
         for (var index = 0; index < expanded.Count; index++)
         {
             list[index] = expanded[index].Name;
+        }
+
+        return list;
+    }
+
+    private static IReadOnlyList<string> SplitCompound(string name)
+    {
+        if (KeepWhole.Contains(name))
+        {
+            return [name];
+        }
+
+        var words = name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var parts = new List<string>();
+        if (words.Length >= 2 && TryCover(words, 0, parts, skipFull: true) && parts.Count >= 2)
+        {
+            return FlattenParts(parts);
+        }
+
+        var hyphen = name.IndexOf('-');
+        if (hyphen > 0 && hyphen == name.LastIndexOf('-'))
+        {
+            var left = name[..hyphen].Trim();
+            var right = name[(hyphen + 1)..].Trim();
+            if (left.Length >= 2 && right.Length >= 2 && IsPiece(left) && IsPiece(right))
+            {
+                return FlattenParts([left, right]);
+            }
+        }
+
+        return [name];
+    }
+
+    private static bool TryCover(string[] words, int index, List<string> parts, bool skipFull)
+    {
+        if (index >= words.Length)
+        {
+            return parts.Count > 0;
+        }
+
+        for (var end = words.Length; end > index; end--)
+        {
+            if (skipFull && index == 0 && end == words.Length)
+            {
+                continue;
+            }
+
+            var piece = string.Join(' ', words[index..end]);
+            if (!IsPiece(piece))
+            {
+                continue;
+            }
+
+            parts.Add(piece);
+            if (TryCover(words, end, parts, skipFull: false))
+            {
+                return true;
+            }
+
+            parts.RemoveAt(parts.Count - 1);
+        }
+
+        return false;
+    }
+
+    private static IReadOnlyList<string> FlattenParts(IReadOnlyList<string> parts)
+    {
+        var list = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var part in parts)
+        {
+            foreach (var inner in SplitCompound(ResolveHead(part)))
+            {
+                foreach (var name in ResolvePiece(inner))
+                {
+                    if (seen.Add(name))
+                    {
+                        list.Add(name);
+                    }
+                }
+            }
+        }
+
+        return list.Count >= 2 ? list : parts;
+    }
+
+    private static string ResolveHead(string piece)
+    {
+        var names = ResolvePiece(piece);
+        return names.Count == 1 ? names[0] : piece;
+    }
+
+    private static bool IsPiece(string piece)
+    {
+        return ResolvePiece(piece).Count > 0;
+    }
+
+    private static IReadOnlyList<string> ResolvePiece(string piece)
+    {
+        var key = Key(piece);
+        if (key.Length == 0)
+        {
+            return [];
+        }
+
+        if (Aliases.TryGetValue(key, out var mapped))
+        {
+            return CanonicalNames(mapped);
+        }
+
+        var compact = Compact(key);
+        if (compact.Length > 0 && CompactAliases.TryGetValue(compact, out mapped))
+        {
+            return CanonicalNames(mapped);
+        }
+
+        var allowed = GenreLexicon.CanonicalName(piece);
+        return allowed is null ? [] : [allowed];
+    }
+
+    private static IReadOnlyList<string> CanonicalNames(IReadOnlyList<string> names)
+    {
+        var list = new List<string>();
+        foreach (var name in names)
+        {
+            var allowed = GenreLexicon.CanonicalName(name);
+            if (allowed is not null)
+            {
+                list.Add(allowed);
+            }
         }
 
         return list;

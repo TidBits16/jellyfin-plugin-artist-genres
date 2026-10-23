@@ -85,7 +85,7 @@
 <body>
   <main>
     <h1>Accepted genres</h1>
-    <p class="lede">Names the Artist Genres plugin will write. Most come from MusicBrainz. indie, alternative, soundtrack, and video game music are kept as umbrellas because MusicBrainz only lists the more specific names.</p>
+    <p class="lede">Names the Artist Genres plugin will write. Combined names such as emo pop and emo rap are stored as the separate names (emo and pop, emo and rap). christian hip hop and christmas music stay as their own names.</p>
     <input id="query" type="search" placeholder="Search genres…" autocomplete="off" />
     <div class="meta">
       <span id="count"></span>
@@ -104,10 +104,46 @@
   </main>
   <script>
     const PAGE_SIZE = 50;
-    const UMBRELLAS = new Set(["indie", "alternative", "soundtrack", "video game music"]);
+    const UMBRELLAS = new Set(["indie", "alternative", "soundtrack", "video game music", "rap"]);
+    const KEEP_WHOLE = new Set([
+      "ballad opera", "cumbia chilena", "industrial musical", "nueva canción chilena",
+      "opera-ballet", "rock musical", "rock opera", "western classical", "western swing"
+    ]);
+    const PIECE_ALIASES = { rap: true, "hip-hop": true, hiphop: true };
     let names = [];
     let filtered = [];
     let page = 0;
+
+    function isPiece(piece, allowed) {
+      const key = piece.toLowerCase();
+      return allowed.has(key) || PIECE_ALIASES[key] === true;
+    }
+
+    function tryCover(words, index, parts, skipFull, allowed) {
+      if (index >= words.length) return parts.length > 0;
+      for (let end = words.length; end > index; end--) {
+        if (skipFull && index === 0 && end === words.length) continue;
+        const piece = words.slice(index, end).join(" ");
+        if (!isPiece(piece, allowed)) continue;
+        parts.push(piece);
+        if (tryCover(words, end, parts, false, allowed)) return true;
+        parts.pop();
+      }
+      return false;
+    }
+
+    function isCompound(name, allowed) {
+      if (KEEP_WHOLE.has(name.toLowerCase())) return false;
+      const words = name.split(/\s+/).filter(Boolean);
+      if (words.length >= 2 && tryCover(words, 0, [], true, allowed)) return true;
+      const hyphen = name.indexOf("-");
+      if (hyphen > 0 && hyphen === name.lastIndexOf("-")) {
+        const left = name.slice(0, hyphen);
+        const right = name.slice(hyphen + 1);
+        if (left.length >= 2 && right.length >= 2 && isPiece(left, allowed) && isPiece(right, allowed)) return true;
+      }
+      return false;
+    }
 
     function matches() {
       const q = document.getElementById("query").value.trim().toLowerCase();
@@ -159,13 +195,16 @@
       const split = (text) => text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
       const seen = new Set();
       names = [];
+      const all = [];
       split(extras).concat(split(official)).forEach((name) => {
         const key = name.toLowerCase();
         if (!seen.has(key)) {
           seen.add(key);
-          names.push(name);
+          all.push(name);
         }
       });
+      const allowed = new Set(all.map((name) => name.toLowerCase()));
+      names = all.filter((name) => !isCompound(name, allowed));
       matches();
     });
 
