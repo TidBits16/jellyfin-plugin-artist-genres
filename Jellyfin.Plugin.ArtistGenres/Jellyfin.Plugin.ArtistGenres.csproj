@@ -4,9 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.1.4.0</Version>
-    <AssemblyVersion>0.1.4.0</AssemblyVersion>
-    <FileVersion>0.1.4.0</FileVersion>
+    <Version>0.1.5.0</Version>
+    <AssemblyVersion>0.1.5.0</AssemblyVersion>
+    <FileVersion>0.1.5.0</FileVersion>
     <AssemblyName>Jellyfin.Plugin.ArtistGenres</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.ArtistGenres</RootNamespace>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Configuration\configPage.html" />
+    <EmbeddedResource Include="Data\musicbrainz-genres.txt" />
+    <EmbeddedResource Include="Data\extra-genres.txt" />
   </ItemGroup>
 
   <ItemGroup>

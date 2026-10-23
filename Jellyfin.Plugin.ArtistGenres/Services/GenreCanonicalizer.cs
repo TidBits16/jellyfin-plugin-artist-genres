@@ -54,15 +54,48 @@ internal static class GenreCanonicalizer
         ["drum & bass"] = ["drum and bass"],
         ["drum n bass"] = ["drum and bass"],
         ["dnb"] = ["drum and bass"],
-        ["xmas"] = ["christmas"],
-        ["x-mas"] = ["christmas"],
+        ["xmas"] = ["christmas music"],
+        ["x-mas"] = ["christmas music"],
+        ["christmas"] = ["christmas music"],
+        ["holiday"] = ["christmas music"],
+        ["alt-pop"] = ["alternative pop"],
+        ["altpop"] = ["alternative pop"],
+        ["bubblegum"] = ["bubblegum pop"],
+        ["hardcore"] = ["digital hardcore"],
+        ["synthpunk"] = ["electropunk"],
+        ["synth-punk"] = ["electropunk"],
+        ["reggae gospel"] = ["gospel"],
+        ["religious"] = ["contemporary christian"],
+        ["modern"] = ["modern classical"],
+        ["minecraft"] = ["video game music"],
+        ["beyond skyrim"] = ["video game music"],
+        ["the elder scrolls"] = ["video game music"],
+        ["game mod"] = ["video game music"],
+        ["murder drones"] = ["soundtrack"],
+        ["acoustic"] = [],
+        ["vocal"] = [],
+        ["remix"] = [],
+        ["single"] = [],
+        ["charity"] = [],
+        ["protogen"] = [],
+        ["voiceroid"] = [],
+        ["drum"] = [],
+        ["bass"] = [],
+        ["artist name on cover"] = [],
+        ["character on cover"] = [],
+        ["robot on cover"] = [],
+        ["animal on cover"] = [],
+        ["anthro on cover"] = [],
+        ["character: n"] = [],
+        ["character: v"] = [],
+        ["character: uzi doorman"] = [],
     };
 
     private static readonly Dictionary<string, string[]> CompactAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         ["hiphop"] = ["hip hop"],
         ["synthpop"] = ["synth-pop"],
-        ["altpop"] = ["alt-pop"],
+        ["altpop"] = ["alternative pop"],
         ["kpop"] = ["k-pop"],
         ["jpop"] = ["j-pop"],
         ["rnb"] = ["r&b"],
@@ -81,7 +114,7 @@ internal static class GenreCanonicalizer
         ["indie folk"] = ["indie", "folk"],
         ["alternative rock"] = ["alternative", "rock"],
         ["alternative pop"] = ["alternative", "pop"],
-        ["alt-pop"] = ["pop"],
+        ["alternative pop"] = ["alternative", "pop"],
         ["christian hip hop"] = ["hip hop"],
         ["christian rock"] = ["rock"],
         ["pop rock"] = ["pop", "rock"],
@@ -142,15 +175,25 @@ internal static class GenreCanonicalizer
                 var mapped = Map(piece);
                 foreach (var alias in mapped.Names)
                 {
-                    Add(list, seen, alias, mapped.FromAlias);
-                    if (!Parents.TryGetValue(alias, out var parents))
+                    var allowed = GenreLexicon.CanonicalName(alias);
+                    if (allowed is null)
+                    {
+                        continue;
+                    }
+
+                    Add(list, seen, allowed, mapped.FromAlias);
+                    if (!Parents.TryGetValue(allowed, out var parents))
                     {
                         continue;
                     }
 
                     foreach (var parent in parents)
                     {
-                        Add(list, seen, parent, fromAlias: true);
+                        var parentName = GenreLexicon.CanonicalName(parent);
+                        if (parentName is not null)
+                        {
+                            Add(list, seen, parentName, fromAlias: true);
+                        }
                     }
                 }
             }
@@ -193,7 +236,7 @@ internal static class GenreCanonicalizer
             return (mapped, true);
         }
 
-        return ([key], false);
+        return GenreLexicon.IsAllowed(key) ? ([key], false) : ([], false);
     }
 
     private static string Key(string value)
