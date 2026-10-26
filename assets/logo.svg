@@ -1,11 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Artist Genres">
-  <rect width="512" height="512" rx="88" fill="#15202c"/>
-  <g fill="#6ea8fe">
-    <ellipse cx="164" cy="348" rx="70" ry="48" transform="rotate(-18 164 348)"/>
-    <rect x="216" y="128" width="30" height="232" rx="6"/>
-    <path d="M246 128c48 14 74 48 70 96-24-16-46-28-70-36z"/>
+  <rect width="512" height="512" rx="112" fill="#15181f"/>
+  <g fill="#4ec8ea">
+    <circle cx="256" cy="118" r="36"/>
+    <path d="M180 216v-18c0-38 34-62 76-62s76 24 76 62v18c-22-18-48-28-76-28s-54 10-76 28z"/>
   </g>
-  <rect x="324" y="214" width="116" height="34" rx="17" fill="#4d7cbf"/>
-  <rect x="324" y="262" width="116" height="34" rx="17" fill="#6ea8fe"/>
-  <rect x="324" y="310" width="116" height="34" rx="17" fill="#c5d8f5"/>
+  <rect x="108" y="252" width="296" height="24" rx="12" fill="#e7ebf2"/>
+  <g fill="#ff5d7c">
+    <rect x="128" y="328" width="96" height="32" rx="16"/>
+    <rect x="240" y="328" width="56" height="32" rx="16"/>
+    <rect x="312" y="328" width="72" height="32" rx="16"/>
+  </g>
+  <rect x="108" y="400" width="168" height="24" rx="12" fill="#e7ebf2"/>
 </svg>

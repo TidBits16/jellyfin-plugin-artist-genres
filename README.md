@@ -1,7 +1,7 @@
 # Artist Genres
 
 <p align="center">
-  <img src="assets/logo.svg" width="220" alt="Artist Genres">
+  <img src="assets/banner.svg" width="1000" alt="Artist Genres">
 </p>
 
 Jellyfin plugin that writes a short list of fundamental genres onto artists, albums, and songs.
