@@ -4,6 +4,7 @@
         "name": "Artist Genres",
         "owner": "TidBits16",
         "category": "Music",
+        "imageUrl": "https://raw.githubusercontent.com/TidBits16/jellyfin-plugin-artist-genres/main/assets/logo.png",
         "overview": "Choose MusicBrainz or Discogs and write that source's genre names onto artists, albums, and songs.",
         "description": "Rewrites music genres from one source so artists and songs use the same names. Pick MusicBrainz or Discogs in the plugin settings.",
         "versions": [
