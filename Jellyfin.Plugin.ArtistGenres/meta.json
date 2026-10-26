@@ -5,9 +5,10 @@
   "overview": "Choose MusicBrainz or Discogs. The music library is rewritten in that source's own genre names, so artists and songs finally match.",
   "owner": "dangerdrive",
   "category": "Music",
+  "imagePath": "banner.svg",
   "targetAbi": "12.0.0.0",
   "framework": "net10.0",
-  "version": "0.2.1.0",
-  "changelog": "Advanced matches DangerDrive Lyrics: a collapsible section with a full-width red Reset All Genres button.",
-  "timestamp": "2026-10-26T16:25:00Z"
+  "version": "0.2.2.0",
+  "changelog": "The plugin page shows the Artist Genres banner.",
+  "timestamp": "2026-10-26T16:45:00Z"
 }
