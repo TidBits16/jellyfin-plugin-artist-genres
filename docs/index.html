@@ -85,7 +85,7 @@
 <body>
   <main>
     <h1>Accepted genres</h1>
-    <p class="lede">Names the Artist Genres plugin will write. Combined names such as emo pop and christian hip hop are stored as the separate names (emo and pop, christian and hip hop). Unique names such as dream pop, k-pop, and hip hop stay as they are.</p>
+    <p class="lede">Names the Artist Genres plugin will write. Two-genre names such as emo pop, classic rock, and christian hip hop are stored as the separate tags. Unique names such as dream pop, k-pop, hip hop, and black metal stay as they are.</p>
     <input id="query" type="search" placeholder="Search genres…" autocomplete="off" />
     <div class="meta">
       <span id="count"></span>
@@ -104,11 +104,16 @@
   </main>
   <script>
     const PAGE_SIZE = 50;
-    const UMBRELLAS = new Set(["indie", "alternative", "soundtrack", "video game music", "rap", "christian", "contemporary", "conscious"]);
+    const UMBRELLAS = new Set([
+      "indie", "alternative", "soundtrack", "video game music", "rap", "christian",
+      "contemporary", "conscious", "classic", "traditional", "modern", "hardcore", "southern"
+    ]);
     const KEEP_WHOLE = new Set([
-      "ballad opera", "cumbia chilena", "dream pop", "hip hop", "industrial musical",
-      "j-pop", "k-pop", "nueva canción chilena", "opera-ballet", "rock musical",
-      "rock opera", "western classical", "western swing"
+      "ballad opera", "black metal", "christmas music", "cumbia chilena", "dark wave",
+      "death metal", "doom metal", "dream pop", "drum and bass", "heavy metal", "hip hop",
+      "industrial musical", "j-pop", "k-pop", "new wave", "no wave", "nueva canción chilena",
+      "opera-ballet", "rock and roll", "rock musical", "rock opera", "synth-pop",
+      "thrash metal", "western classical", "western swing"
     ]);
     const PIECE_ALIASES = { rap: true, "hip-hop": true, hiphop: true };
     let names = [];

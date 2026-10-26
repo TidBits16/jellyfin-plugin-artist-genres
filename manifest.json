@@ -8,6 +8,14 @@
         "description": "Rewrites music genres from one source so artists and songs use the same names. Pick MusicBrainz or Discogs in the plugin settings.",
         "versions": [
             {
+                "version": "0.1.13.0",
+                "changelog": "Split remaining two-genre names such as classic rock and hardcore punk. Unique names such as black metal stay whole.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-artist-genres/releases/download/v0.1.13.0/artist-genres_0.1.13.0.zip",
+                "checksum": "9b30438ade50a21b13c4b564f06f89f6",
+                "timestamp": "2026-10-26T16:05:00Z"
+            },
+            {
                 "version": "0.1.12.0",
                 "changelog": "country rock is country and rock. dancefloor drum and bass is drum and bass.",
                 "targetAbi": "12.0.0.0",

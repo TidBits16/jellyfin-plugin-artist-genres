@@ -1,6 +1,6 @@
 name: "Artist Genres"
 guid: "c4e8a1d7-5b39-4f6a-8e2c-91d0f7a4b6e3"
-version: "0.1.12.0"
+version: "0.1.13.0"
 targetAbi: "12.0.0.0"
 framework: "net10.0"
 owner: "dangerdrive"
@@ -9,4 +9,4 @@ description: "Write one genre vocabulary onto artists, albums, and songs."
 category: "Music"
 artifacts:
   - "Jellyfin.Plugin.ArtistGenres.dll"
-changelog: "country rock is country and rock. dancefloor drum and bass is drum and bass."
+changelog: "Split remaining two-genre names such as classic rock and hardcore punk. Unique names such as black metal stay whole."

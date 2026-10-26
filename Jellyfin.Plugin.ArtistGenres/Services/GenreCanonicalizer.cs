@@ -61,12 +61,10 @@ internal static class GenreCanonicalizer
         ["alt-pop"] = ["alternative pop"],
         ["altpop"] = ["alternative pop"],
         ["bubblegum"] = ["bubblegum pop"],
-        ["hardcore"] = ["digital hardcore"],
         ["synthpunk"] = ["electropunk"],
         ["synth-punk"] = ["electropunk"],
         ["reggae gospel"] = ["gospel"],
-        ["religious"] = ["contemporary christian"],
-        ["modern"] = ["modern classical"],
+        ["religious"] = ["christian"],
         ["minecraft"] = ["video game music"],
         ["beyond skyrim"] = ["video game music"],
         ["the elder scrolls"] = ["video game music"],
@@ -110,16 +108,28 @@ internal static class GenreCanonicalizer
     private static readonly HashSet<string> KeepWhole = new(StringComparer.OrdinalIgnoreCase)
     {
         "ballad opera",
+        "black metal",
+        "christmas music",
         "cumbia chilena",
+        "dark wave",
+        "death metal",
+        "doom metal",
         "dream pop",
+        "drum and bass",
+        "heavy metal",
         "hip hop",
         "industrial musical",
         "j-pop",
         "k-pop",
+        "new wave",
+        "no wave",
         "nueva canción chilena",
         "opera-ballet",
+        "rock and roll",
         "rock musical",
         "rock opera",
+        "synth-pop",
+        "thrash metal",
         "western classical",
         "western swing"
     };
@@ -135,12 +145,9 @@ internal static class GenreCanonicalizer
         ["dubstep"] = ["electronic"],
         ["future bass"] = ["electronic"],
         ["drum and bass"] = ["electronic"],
-        ["modern classical"] = ["classical"],
         ["orchestral"] = ["classical"],
         ["vocal jazz"] = ["jazz"],
         ["trap"] = ["hip hop"],
-        ["bedroom pop"] = ["pop"],
-        ["art pop"] = ["pop"],
         ["rock musical"] = ["musical"],
         ["rap"] = ["hip hop"],
     };
@@ -334,7 +341,18 @@ internal static class GenreCanonicalizer
 
     private static bool IsPiece(string piece)
     {
-        return GenreLexicon.IsAllowed(piece);
+        if (GenreLexicon.IsAllowed(piece))
+        {
+            return true;
+        }
+
+        var names = ResolvePiece(piece);
+        if (names.Count != 1)
+        {
+            return false;
+        }
+
+        return Compact(names[0]) == Compact(Key(piece));
     }
 
     private static IReadOnlyList<string> ResolvePiece(string piece)

@@ -6,3 +6,8 @@ rap
 christian
 contemporary
 conscious
+classic
+traditional
+modern
+hardcore
+southern
