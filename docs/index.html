@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Accepted genres — Artist Genres</title>
-  <meta name="description" content="Every genre name the Artist Genres Jellyfin plugin will write: MusicBrainz official genres plus a few umbrellas." />
+  <meta name="description" content="The short list of fundamental genres the Artist Genres Jellyfin plugin will write." />
   <style>
     :root {
       --bg: #101014;
@@ -85,7 +85,7 @@
 <body>
   <main>
     <h1>Accepted genres</h1>
-    <p class="lede">Names the Artist Genres plugin will write. Two-genre names such as emo pop, classic rock, and christian hip hop are stored as the separate tags. Unique names such as dream pop, k-pop, hip hop, and black metal stay as they are.</p>
+    <p class="lede">The plugin only writes these fundamental names, so filters stay short enough to search. dream pop becomes dream and pop. black metal becomes metal. k-pop stays k-pop and also gets pop.</p>
     <input id="query" type="search" placeholder="Search genres…" autocomplete="off" />
     <div class="meta">
       <span id="count"></span>
@@ -104,58 +104,9 @@
   </main>
   <script>
     const PAGE_SIZE = 50;
-    const UMBRELLAS = new Set([
-      "indie", "alternative", "soundtrack", "video game music", "rap", "christian",
-      "contemporary", "conscious", "classic", "traditional", "modern", "hardcore", "southern"
-    ]);
-    const KEEP_WHOLE = new Set([
-      "ballad opera", "black metal", "christmas music", "cumbia chilena", "dark wave",
-      "death metal", "doom metal", "dream pop", "drum and bass", "heavy metal", "hip hop",
-      "industrial musical", "j-pop", "k-pop", "new wave", "no wave", "nueva canción chilena",
-      "opera-ballet", "rock and roll", "rock musical", "rock opera", "synth-pop",
-      "thrash metal", "western classical", "western swing"
-    ]);
-    const PIECE_ALIASES = { rap: true, "hip-hop": true, hiphop: true };
     let names = [];
     let filtered = [];
     let page = 0;
-
-    function isPiece(piece, allowed) {
-      const key = piece.toLowerCase();
-      return allowed.has(key) || PIECE_ALIASES[key] === true;
-    }
-
-    function tryCover(words, index, parts, skipFull, allowed) {
-      if (index >= words.length) return parts.length > 0;
-      for (let end = words.length; end > index; end--) {
-        if (skipFull && index === 0 && end === words.length) continue;
-        const piece = words.slice(index, end).join(" ");
-        if (!isPiece(piece, allowed)) continue;
-        parts.push(piece);
-        if (tryCover(words, end, parts, false, allowed)) return true;
-        parts.pop();
-      }
-      return false;
-    }
-
-    function isCompound(name, allowed) {
-      if (KEEP_WHOLE.has(name.toLowerCase())) return false;
-      const words = name.split(/\s+/).filter(Boolean);
-      if (words.length >= 2 && tryCover(words, 0, [], true, allowed)) return true;
-      for (let start = 1; start < words.length; start++) {
-        const suffix = words.slice(start).join(" ");
-        if (!isPiece(suffix, allowed)) continue;
-        const prefix = words.slice(0, start).join(" ");
-        if (isPiece(prefix, allowed) || suffix.includes(" ")) return true;
-      }
-      const hyphen = name.indexOf("-");
-      if (hyphen > 0 && hyphen === name.lastIndexOf("-")) {
-        const left = name.slice(0, hyphen);
-        const right = name.slice(hyphen + 1);
-        if (left.length >= 2 && right.length >= 2 && isPiece(left, allowed) && isPiece(right, allowed)) return true;
-      }
-      return false;
-    }
 
     function matches() {
       const q = document.getElementById("query").value.trim().toLowerCase();
@@ -183,12 +134,6 @@
           const label = document.createElement("span");
           label.textContent = name;
           row.appendChild(label);
-          if (UMBRELLAS.has(name)) {
-            const tag = document.createElement("span");
-            tag.className = "tag";
-            tag.textContent = "umbrella";
-            row.appendChild(tag);
-          }
           list.appendChild(row);
         });
       }
@@ -200,23 +145,8 @@
       document.getElementById("next").disabled = page >= pages - 1;
     }
 
-    Promise.all([
-      fetch("data/extra-genres.txt").then((r) => r.text()),
-      fetch("data/musicbrainz-genres.txt").then((r) => r.text()),
-    ]).then(([extras, official]) => {
-      const split = (text) => text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
-      const seen = new Set();
-      names = [];
-      const all = [];
-      split(extras).concat(split(official)).forEach((name) => {
-        const key = name.toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          all.push(name);
-        }
-      });
-      const allowed = new Set(all.map((name) => name.toLowerCase()));
-      names = all.filter((name) => !isCompound(name, allowed));
+    fetch("data/extra-genres.txt").then((r) => r.text()).then((text) => {
+      names = text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
       matches();
     });
 

@@ -1,13 +1,42 @@
-indie
 alternative
-soundtrack
-video game music
-rap
+ambient
+blues
 christian
-contemporary
-conscious
-classic
-traditional
-modern
+christmas music
+classical
+comedy
+country
+dance
+disco
+dream
+drum and bass
+electronic
+emo
+experimental
+folk
+funk
+gospel
 hardcore
-southern
+hip hop
+house
+indie
+industrial
+j-pop
+jazz
+k-pop
+latin
+metal
+musical
+new wave
+pop
+punk
+r&b
+rap
+reggae
+rock
+ska
+soul
+soundtrack
+techno
+trance
+video game music

@@ -33,7 +33,8 @@ internal static class GenreCanonicalizer
         ["hip-hop"] = ["hip hop"],
         ["hiphop"] = ["hip hop"],
         ["rap"] = ["rap"],
-        ["darkwave"] = ["dark wave"],
+        ["darkwave"] = ["new wave"],
+        ["dark wave"] = ["new wave"],
         ["ai-generated"] = ["ai generated"],
         ["ai generated"] = ["ai generated"],
         ["classical: world"] = ["classical"],
@@ -42,15 +43,16 @@ internal static class GenreCanonicalizer
         ["rn b"] = ["r&b"],
         ["rnb"] = ["r&b"],
         ["rhythm and blues"] = ["r&b"],
-        ["synthpop"] = ["synth-pop"],
-        ["synth pop"] = ["synth-pop"],
-        ["alt pop"] = ["alternative pop"],
+        ["synthpop"] = ["pop", "electronic"],
+        ["synth pop"] = ["pop", "electronic"],
+        ["synth-pop"] = ["pop", "electronic"],
+        ["alt pop"] = ["alternative", "pop"],
         ["kpop"] = ["k-pop"],
         ["k pop"] = ["k-pop"],
         ["jpop"] = ["j-pop"],
         ["j pop"] = ["j-pop"],
         ["electropop"] = ["electropop"],
-        ["electro pop"] = ["electropop"],
+        ["electro pop"] = ["pop", "electronic"],
         ["drum & bass"] = ["drum and bass"],
         ["drum n bass"] = ["drum and bass"],
         ["dnb"] = ["drum and bass"],
@@ -58,11 +60,13 @@ internal static class GenreCanonicalizer
         ["x-mas"] = ["christmas music"],
         ["christmas"] = ["christmas music"],
         ["holiday"] = ["christmas music"],
-        ["alt-pop"] = ["alternative pop"],
-        ["altpop"] = ["alternative pop"],
-        ["bubblegum"] = ["bubblegum pop"],
-        ["synthpunk"] = ["electropunk"],
-        ["synth-punk"] = ["electropunk"],
+        ["alt-pop"] = ["alternative", "pop"],
+        ["altpop"] = ["alternative", "pop"],
+        ["bubblegum"] = ["pop"],
+        ["synthpunk"] = ["punk", "electronic"],
+        ["synth-punk"] = ["punk", "electronic"],
+        ["electropunk"] = ["punk", "electronic"],
+        ["electropop"] = ["pop", "electronic"],
         ["reggae gospel"] = ["gospel"],
         ["religious"] = ["christian"],
         ["minecraft"] = ["video game music"],
@@ -92,8 +96,8 @@ internal static class GenreCanonicalizer
     private static readonly Dictionary<string, string[]> CompactAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         ["hiphop"] = ["hip hop"],
-        ["synthpop"] = ["synth-pop"],
-        ["altpop"] = ["alternative pop"],
+        ["synthpop"] = ["pop", "electronic"],
+        ["altpop"] = ["alternative", "pop"],
         ["kpop"] = ["k-pop"],
         ["jpop"] = ["j-pop"],
         ["rnb"] = ["r&b"],
@@ -107,49 +111,56 @@ internal static class GenreCanonicalizer
 
     private static readonly HashSet<string> KeepWhole = new(StringComparer.OrdinalIgnoreCase)
     {
-        "ballad opera",
-        "black metal",
         "christmas music",
-        "cumbia chilena",
-        "dark wave",
-        "death metal",
-        "doom metal",
-        "dream pop",
         "drum and bass",
-        "heavy metal",
         "hip hop",
-        "industrial musical",
-        "j-pop",
-        "k-pop",
         "new wave",
-        "no wave",
-        "nueva canción chilena",
-        "opera-ballet",
-        "rock and roll",
-        "rock musical",
-        "rock opera",
-        "synth-pop",
-        "thrash metal",
-        "western classical",
-        "western swing"
+        "video game music"
+    };
+
+    private static readonly Dictionary<string, string[]> FoldExact = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["bluegrass"] = ["folk"],
+        ["bossa nova"] = ["jazz"],
+        ["chiptune"] = ["electronic"],
+        ["dub"] = ["reggae"],
+        ["dubstep"] = ["electronic"],
+        ["electro"] = ["electronic"],
+        ["electronica"] = ["electronic"],
+        ["future bass"] = ["electronic"],
+        ["grime"] = ["hip hop"],
+        ["grunge"] = ["rock"],
+        ["idm"] = ["electronic"],
+        ["lo-fi"] = ["indie"],
+        ["opera"] = ["classical"],
+        ["orchestral"] = ["classical"],
+        ["phonk"] = ["hip hop"],
+        ["rock and roll"] = ["rock"],
+        ["rock musical"] = ["rock", "musical"],
+        ["rock opera"] = ["rock", "classical"],
+        ["shoegaze"] = ["rock", "indie"],
+        ["singer-songwriter"] = ["folk"],
+        ["swing"] = ["jazz"],
+        ["synthwave"] = ["electronic"],
+        ["trap"] = ["hip hop"],
+        ["vaporwave"] = ["electronic"],
+        ["western classical"] = ["classical"],
+        ["western swing"] = ["country", "jazz"]
     };
 
     private static readonly Dictionary<string, string[]> Parents = new(StringComparer.OrdinalIgnoreCase)
     {
         ["video game music"] = ["soundtrack"],
-        ["chiptune"] = ["electronic"],
-        ["synth-pop"] = ["pop", "electronic"],
-        ["electropop"] = ["pop", "electronic"],
-        ["electro"] = ["electronic"],
         ["house"] = ["electronic"],
-        ["dubstep"] = ["electronic"],
-        ["future bass"] = ["electronic"],
+        ["techno"] = ["electronic"],
+        ["trance"] = ["electronic"],
         ["drum and bass"] = ["electronic"],
-        ["orchestral"] = ["classical"],
-        ["vocal jazz"] = ["jazz"],
-        ["trap"] = ["hip hop"],
-        ["rock musical"] = ["musical"],
+        ["ambient"] = ["electronic"],
+        ["industrial"] = ["electronic"],
+        ["disco"] = ["dance"],
         ["rap"] = ["hip hop"],
+        ["k-pop"] = ["pop"],
+        ["j-pop"] = ["pop"]
     };
 
     /// <summary>
@@ -181,15 +192,9 @@ internal static class GenreCanonicalizer
                 var mapped = Map(piece);
                 foreach (var alias in mapped.Names)
                 {
-                    var allowed = GenreLexicon.CanonicalName(alias);
-                    if (allowed is null)
-                    {
-                        continue;
-                    }
-
-                    var written = SplitCompound(allowed);
+                    var written = FoldToFundamentals(alias);
                     var split = written.Count > 1
-                        || (written.Count == 1 && !string.Equals(written[0], allowed, StringComparison.OrdinalIgnoreCase));
+                        || (written.Count == 1 && !string.Equals(written[0], alias, StringComparison.OrdinalIgnoreCase));
                     foreach (var nameToWrite in written)
                     {
                         Add(list, seen, nameToWrite, mapped.FromAlias || split);
@@ -228,6 +233,89 @@ internal static class GenreCanonicalizer
 
         return list;
     }
+
+    private static IReadOnlyList<string> FoldToFundamentals(string name)
+    {
+        var fundamental = GenreLexicon.CanonicalName(name);
+        if (fundamental is not null)
+        {
+            return [fundamental];
+        }
+
+        if (FoldExact.TryGetValue(name, out var exact))
+        {
+            return CanonicalNames(exact);
+        }
+
+        var split = SplitCompound(name);
+        if (split.Count > 1
+            || (split.Count == 1 && !string.Equals(split[0], name, StringComparison.OrdinalIgnoreCase)))
+        {
+            var folded = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var part in split)
+            {
+                foreach (var inner in FoldToFundamentals(part))
+                {
+                    if (seen.Add(inner))
+                    {
+                        folded.Add(inner);
+                    }
+                }
+            }
+
+            if (folded.Count > 0)
+            {
+                return folded;
+            }
+        }
+
+        return SuffixFundamentals(name);
+    }
+
+    private static IReadOnlyList<string> SuffixFundamentals(string name)
+    {
+        var key = Key(name);
+        foreach (var fundamental in Suffixes)
+        {
+            if (key.Length <= fundamental.Length || key.Equals(fundamental, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (key.EndsWith(" " + fundamental, StringComparison.OrdinalIgnoreCase)
+                || key.EndsWith("-" + fundamental, StringComparison.OrdinalIgnoreCase))
+            {
+                var prefix = key[..^(fundamental.Length + 1)].Trim();
+                var list = new List<string>();
+                var prefixName = GenreLexicon.CanonicalName(prefix);
+                if (prefixName is not null)
+                {
+                    list.Add(prefixName);
+                }
+
+                var head = GenreLexicon.CanonicalName(fundamental);
+                if (head is not null)
+                {
+                    list.Add(head);
+                }
+
+                return list;
+            }
+        }
+
+        return [];
+    }
+
+    private static readonly string[] Suffixes =
+    [
+        "hip hop", "drum and bass", "new wave", "video game music", "christmas music",
+        "hardcore", "industrial", "electronic", "classical", "soundtrack",
+        "alternative", "experimental", "christian", "ambient",
+        "techno", "trance", "house", "disco", "dance", "metal", "punk", "rock",
+        "jazz", "blues", "folk", "country", "gospel", "reggae", "soul", "funk",
+        "latin", "ska", "emo", "rap", "pop", "r&b"
+    ];
 
     private static IReadOnlyList<string> SplitCompound(string name)
     {
@@ -412,7 +500,7 @@ internal static class GenreCanonicalizer
             return (mapped, true);
         }
 
-        return GenreLexicon.IsAllowed(key) ? ([key], false) : ([], false);
+        return ([key], false);
     }
 
     private static string Key(string value)
