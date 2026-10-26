@@ -1,8 +1,12 @@
 # Artist Genres
 
-Jellyfin plugin that writes one genre vocabulary onto artists, albums, and songs.
+<p align="center">
+  <img src="assets/logo.svg" width="220" alt="Artist Genres">
+</p>
 
-Accepted genre names (MusicBrainz official list, plus a few umbrellas):
+Jellyfin plugin that writes a short list of fundamental genres onto artists, albums, and songs.
+
+Accepted names:
 
 **https://tidbits16.github.io/jellyfin-plugin-artist-genres/**
 
