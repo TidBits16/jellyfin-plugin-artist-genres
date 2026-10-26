@@ -1,42 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Artist Genres">
-  <defs>
-    <linearGradient id="bg" x1="80" y1="40" x2="460" y2="480" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#16324a"/>
-      <stop offset="1" stop-color="#0d0d14"/>
-    </linearGradient>
-    <linearGradient id="note" x1="140" y1="120" x2="250" y2="380" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#9ec5ff"/>
-      <stop offset="1" stop-color="#6ea8fe"/>
-    </linearGradient>
-    <linearGradient id="chip" x1="250" y1="200" x2="460" y2="430" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#1b2d44"/>
-      <stop offset="1" stop-color="#121820"/>
-    </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="10" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-
-  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
-  <rect x="18" y="18" width="476" height="476" rx="94" fill="none" stroke="#6ea8fe" stroke-opacity="0.45" stroke-width="4"/>
-  <circle cx="186" cy="248" r="128" fill="#6ea8fe" opacity="0.16"/>
-
-  <g fill="url(#note)" filter="url(#glow)">
-    <ellipse cx="176" cy="318" rx="62" ry="42" transform="rotate(-22 176 318)"/>
-    <rect x="220" y="128" width="20" height="196" rx="8"/>
-    <path d="M240 128c58 10 96 52 92 108-28-22-52-34-92-42v-66z"/>
+  <rect width="512" height="512" rx="88" fill="#15202c"/>
+  <g fill="#6ea8fe">
+    <ellipse cx="164" cy="348" rx="70" ry="48" transform="rotate(-18 164 348)"/>
+    <rect x="216" y="128" width="30" height="232" rx="6"/>
+    <path d="M246 128c48 14 74 48 70 96-24-16-46-28-70-36z"/>
   </g>
-
-  <g transform="translate(236 178)">
-    <rect width="220" height="228" rx="36" fill="url(#chip)" stroke="#8bb8ff" stroke-opacity="0.5" stroke-width="3"/>
-    <rect x="22" y="24" width="128" height="28" rx="14" fill="#c62828"/>
-    <rect x="22" y="64" width="96" height="28" rx="14" fill="#6ea8fe"/>
-    <rect x="22" y="104" width="112" height="28" rx="14" fill="#7dd3a0"/>
-    <path d="M86 148l18 16 18-16" fill="none" stroke="#9a9aaa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <rect x="22" y="176" width="176" height="32" rx="16" fill="#ececf1"/>
-  </g>
+  <rect x="324" y="214" width="116" height="34" rx="17" fill="#4d7cbf"/>
+  <rect x="324" y="262" width="116" height="34" rx="17" fill="#6ea8fe"/>
+  <rect x="324" y="310" width="116" height="34" rx="17" fill="#c5d8f5"/>
 </svg>
