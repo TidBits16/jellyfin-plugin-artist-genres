@@ -7,7 +7,7 @@
   "category": "Music",
   "targetAbi": "12.0.0.0",
   "framework": "net10.0",
-  "version": "0.1.10.0",
-  "changelog": "dream pop, k-pop, and hip hop stay as their own names.",
-  "timestamp": "2026-10-23T16:12:00Z"
+  "version": "0.1.11.0",
+  "changelog": "conscious hip hop and contemporary names split into the separate tags.",
+  "timestamp": "2026-10-26T16:00:00Z"
 }

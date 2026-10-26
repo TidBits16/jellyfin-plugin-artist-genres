@@ -139,7 +139,6 @@ internal static class GenreCanonicalizer
         ["orchestral"] = ["classical"],
         ["vocal jazz"] = ["jazz"],
         ["trap"] = ["hip hop"],
-        ["conscious hip hop"] = ["hip hop"],
         ["bedroom pop"] = ["pop"],
         ["art pop"] = ["pop"],
         ["rock musical"] = ["musical"],
