@@ -236,6 +236,29 @@ internal static class GenreCanonicalizer
             return FlattenParts(parts);
         }
 
+        if (words.Length >= 2)
+        {
+            for (var start = 1; start < words.Length; start++)
+            {
+                var suffix = string.Join(' ', words[start..]);
+                if (!IsPiece(suffix))
+                {
+                    continue;
+                }
+
+                var prefix = string.Join(' ', words[..start]);
+                if (IsPiece(prefix))
+                {
+                    return FlattenParts([prefix, suffix]);
+                }
+
+                if (suffix.Contains(' '))
+                {
+                    return SplitCompound(suffix);
+                }
+            }
+        }
+
         var hyphen = name.IndexOf('-');
         if (hyphen > 0 && hyphen == name.LastIndexOf('-'))
         {

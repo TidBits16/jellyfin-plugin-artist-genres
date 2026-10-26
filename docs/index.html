@@ -137,6 +137,12 @@
       if (KEEP_WHOLE.has(name.toLowerCase())) return false;
       const words = name.split(/\s+/).filter(Boolean);
       if (words.length >= 2 && tryCover(words, 0, [], true, allowed)) return true;
+      for (let start = 1; start < words.length; start++) {
+        const suffix = words.slice(start).join(" ");
+        if (!isPiece(suffix, allowed)) continue;
+        const prefix = words.slice(0, start).join(" ");
+        if (isPiece(prefix, allowed) || suffix.includes(" ")) return true;
+      }
       const hyphen = name.indexOf("-");
       if (hyphen > 0 && hyphen === name.lastIndexOf("-")) {
         const left = name.slice(0, hyphen);
