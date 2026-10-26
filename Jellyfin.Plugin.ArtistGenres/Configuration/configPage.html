@@ -26,15 +26,79 @@
             max-width: 44em;
         }
 
+        #artistGenresConfigurationPage .emby-collapse {
+            margin: 0.5em 0 1.5em;
+            max-width: 48em;
+        }
+
+        #artistGenresConfigurationPage .emby-collapsible-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 0;
+            padding: 0.85em 2em 0.85em 0.1em;
+            background: transparent;
+            color: inherit;
+            border: 0;
+            border-bottom: 0.1em solid rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+            text-align: left;
+            text-transform: none;
+            cursor: pointer;
+        }
+
+        #artistGenresConfigurationPage .emby-collapsible-title {
+            margin: 0;
+            font-size: 1.15em;
+            font-weight: 500;
+        }
+
+        #artistGenresConfigurationPage .emby-collapse-expandIcon {
+            position: absolute;
+            right: 0.2em;
+            font-size: 1.6em;
+            transition: transform 180ms ease-out;
+        }
+
+        #artistGenresConfigurationPage .emby-collapse-expandIconExpanded {
+            transform: rotate(180deg);
+        }
+
+        #artistGenresConfigurationPage .collapseContent {
+            display: none;
+            padding-top: 1.1em;
+        }
+
+        #artistGenresConfigurationPage .collapseContent.expanded {
+            display: block;
+        }
+
+        #artistGenresConfigurationPage #artistGenresReset {
+            width: 100%;
+            min-height: 3.4em;
+            margin-top: 0.4em;
+            background: #c62828 !important;
+            color: #fff !important;
+            font-size: 1.15em;
+        }
+
         #artistGenresConfigurationPage .artistGenresActions {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 0.75em;
+            max-width: 48em;
             margin-top: 0.5em;
         }
 
         #artistGenresConfigurationPage .artistGenresActions .emby-button {
+            width: 100%;
             margin: 0;
+        }
+
+        #artistGenresConfigurationPage #artistGenresApply {
+            background: #757575;
+            color: #fff;
         }
     </style>
 
@@ -205,24 +269,28 @@
                     </div>
                 </div>
 
+                <div class="emby-collapse">
+                    <button type="button" id="artistGenresAdvanced" class="emby-collapsible-button">
+                        <h3 class="emby-collapsible-title">Advanced</h3>
+                        <span class="material-icons emby-collapse-expandIcon" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div id="artistGenresAdvancedContent" class="collapseContent">
+                        <button is="emby-button" type="button" id="artistGenresReset" class="raised block emby-button">
+                            <span>Reset All Genres</span>
+                        </button>
+                        <div class="fieldDescription">Forgets cached lookups, clears genres on the library, and fetches them again from the selected source. This takes a while.</div>
+                    </div>
+                </div>
+
                 <div class="artistGenresActions">
-                    <button is="emby-button" type="submit" class="raised button-submit emby-button">
+                    <button is="emby-button" type="submit" class="raised button-submit block emby-button">
                         <span>Save</span>
                     </button>
-                    <button is="emby-button" type="button" id="artistGenresApply" class="raised emby-button">
-                        <span>Save and apply to library</span>
+                    <button is="emby-button" type="button" id="artistGenresApply" class="raised block emby-button">
+                        <span>Apply</span>
                     </button>
                 </div>
-                <div class="fieldDescription">Apply runs in the background. The first pass asks the source about each album, about one a second, and later passes reuse what they already fetched.</div>
-
-                <div class="selectContainer" style="max-width: 48em; margin-top: 1.5em;">
-                    <label class="selectLabel" for="artistGenresAdvanced">Advanced</label>
-                    <select is="emby-select" id="artistGenresAdvanced" class="emby-select-withcolor">
-                        <option value="" selected>Choose an action</option>
-                        <option value="reset">Reset All Genres</option>
-                    </select>
-                    <div class="fieldDescription">Reset forgets cached lookups, clears genres on artists, albums, and songs, then fetches them again from the selected source. This takes a while.</div>
-                </div>
+                <div class="fieldDescription">Apply saves and runs in the background. The first pass asks the source about each album, about one a second, and later passes reuse what they already fetched.</div>
             </form>
         </div>
     </div>
@@ -415,17 +483,13 @@
                 saveConfiguration("apply");
             });
 
-            document.getElementById("artistGenresAdvanced").addEventListener("change", function (event) {
-                var action = event.target.value;
-                event.target.value = "";
-                if (action !== "reset") {
-                    return;
-                }
+            document.getElementById("artistGenresAdvanced").addEventListener("click", function () {
+                var content = document.getElementById("artistGenresAdvancedContent");
+                var open = content.classList.toggle("expanded");
+                this.querySelector(".emby-collapse-expandIcon").classList.toggle("emby-collapse-expandIconExpanded", open);
+            });
 
-                if (!window.confirm("Reset all genres? This forgets cached lookups, clears genres on the library, and fetches them again from the selected source. It takes a while.")) {
-                    return;
-                }
-
+            document.getElementById("artistGenresReset").addEventListener("click", function () {
                 saveConfiguration("reset");
             });
         })();

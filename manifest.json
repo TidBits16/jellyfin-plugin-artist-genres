@@ -8,6 +8,14 @@
         "description": "Rewrites music genres from one source so artists and songs use the same names. Pick MusicBrainz or Discogs in the plugin settings.",
         "versions": [
             {
+                "version": "0.2.1.0",
+                "changelog": "Advanced matches DangerDrive Lyrics: a collapsible section with a full-width red Reset All Genres button.",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://github.com/TidBits16/jellyfin-plugin-artist-genres/releases/download/v0.2.1.0/artist-genres_0.2.1.0.zip",
+                "checksum": "a52cc4796509e08cb2a73d130340f2d1",
+                "timestamp": "2026-10-26T16:25:00Z"
+            },
+            {
                 "version": "0.2.0.0",
                 "changelog": "Write a short list of fundamental genres so filters are searchable. dream pop is dream and pop.",
                 "targetAbi": "12.0.0.0",
